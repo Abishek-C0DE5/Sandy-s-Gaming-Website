@@ -12,23 +12,23 @@ export default async function AdminLayout({
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Admin Subheader Navigation */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-white/[0.08] pb-4 gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-md bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+            <span className="inline-flex items-center rounded-full border border-[#D71932]/40 bg-[#171719] px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-[#D71932] shadow-[0_0_10px_rgba(215,25,50,0.2)]">
               Staff Portal
             </span>
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs font-mono text-[#A5A5AD]">
               {profile.display_name} ({profile.role.replace('_', ' ')})
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="mt-2 text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
             Operational Dashboard
           </h1>
         </div>
 
         <div className="flex items-center gap-3">
-          <nav className="flex items-center gap-2 text-xs font-medium">
+          <nav className="flex items-center gap-2 text-xs font-bold">
             <Link
               href="/admin/posts/new"
               className="flex items-center gap-1.5 rounded-lg bg-[#D71932] px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_12px_rgba(215,25,50,0.35)] hover:bg-[#b01328] transition-colors"
@@ -38,21 +38,21 @@ export default async function AdminLayout({
             </Link>
             <Link
               href="/admin/posts"
-              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#171719] px-3 py-1.5 text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
             >
               <FileText className="h-3.5 w-3.5" />
               <span>All Posts</span>
             </Link>
             <Link
               href="/admin/conversations"
-              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#171719] px-3 py-1.5 text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
             >
               <Inbox className="h-3.5 w-3.5" />
               <span>Inbox (Chats)</span>
             </Link>
             <Link
               href="/admin/contact-requests"
-              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#171719] px-3 py-1.5 text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
             >
               <Mail className="h-3.5 w-3.5" />
               <span>Contact Requests</span>
@@ -60,7 +60,7 @@ export default async function AdminLayout({
             {profile.role === 'super_admin' && (
               <Link
                 href="/super-admin"
-                className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-3 py-1.5 text-white hover:bg-purple-500"
+                className="flex items-center gap-1.5 rounded-lg bg-purple-600 px-3 py-1.5 text-white hover:bg-purple-500 shadow-[0_0_12px_rgba(147,51,234,0.3)] transition-colors"
               >
                 <Shield className="h-3.5 w-3.5" />
                 <span>Super Admin</span>
@@ -71,7 +71,7 @@ export default async function AdminLayout({
           <form action="/auth/signout" method="post">
             <button
               type="submit"
-              className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-neutral-700 dark:hover:bg-red-950/30"
+              className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-950/20 px-2.5 py-1.5 text-xs font-bold text-red-400 hover:bg-red-900/40 transition-colors"
               title="Sign Out"
             >
               <span>Sign Out</span>

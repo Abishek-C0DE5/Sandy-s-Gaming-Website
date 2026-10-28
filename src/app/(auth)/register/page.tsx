@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { Mail, Lock, User, ArrowRight, Shield, AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Shield, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -92,28 +93,35 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-neutral-200 bg-white p-8 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-white/[0.08] bg-[#101012] p-8 shadow-2xl">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#D71932] text-white shadow-sm">
-            <Shield className="h-6 w-6" />
+          <div className="mx-auto relative h-16 w-16 rounded-2xl overflow-hidden border border-[#D71932]/40 bg-[#171719] flex items-center justify-center shadow-[0_0_25px_rgba(215,25,50,0.35)] p-2">
+            <Image
+              src="/brand/sandys-gaming-logo.png"
+              alt="Sandy's Gaming"
+              width={56}
+              height={56}
+              className="object-contain"
+              priority
+            />
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="mt-4 text-2xl font-black uppercase tracking-wider text-white">
             Create Your Account
           </h1>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="mt-2 text-sm text-[#A5A5AD]">
             Join Sandy&apos;s Gaming to start chatting with our Support Team.
           </p>
         </div>
 
         {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-400">
+          <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-950/30 p-3 text-xs text-red-400">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-950/30 p-3 text-xs text-emerald-400">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             <span>{successMsg}</span>
           </div>
@@ -121,11 +129,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label htmlFor="displayName" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            <label htmlFor="displayName" className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]">
               Chosen Display Name
             </label>
-            <div className="relative mt-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+            <div className="relative mt-1.5">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#A5A5AD]">
                 <User className="h-4 w-4" />
               </div>
               <input
@@ -137,17 +145,17 @@ export default function RegisterPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="GamerTag or Your Name"
-                className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="block w-full rounded-lg border border-white/[0.1] bg-[#171719] py-2.5 pr-3 pl-10 text-xs text-white placeholder:text-[#64646D] focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] focus:outline-none transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="reg-email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            <label htmlFor="reg-email" className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]">
               Email Address
             </label>
-            <div className="relative mt-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+            <div className="relative mt-1.5">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#A5A5AD]">
                 <Mail className="h-4 w-4" />
               </div>
               <input
@@ -159,17 +167,17 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="block w-full rounded-lg border border-white/[0.1] bg-[#171719] py-2.5 pr-3 pl-10 text-xs text-white placeholder:text-[#64646D] focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] focus:outline-none transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="reg-password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            <label htmlFor="reg-password" className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]">
               Password
             </label>
-            <div className="relative mt-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+            <div className="relative mt-1.5">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#A5A5AD]">
                 <Lock className="h-4 w-4" />
               </div>
               <input
@@ -182,17 +190,17 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="block w-full rounded-lg border border-white/[0.1] bg-[#171719] py-2.5 pr-3 pl-10 text-xs text-white placeholder:text-[#64646D] focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] focus:outline-none transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="reg-confirm-password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+            <label htmlFor="reg-confirm-password" className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]">
               Confirm Password
             </label>
-            <div className="relative mt-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+            <div className="relative mt-1.5">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#A5A5AD]">
                 <Lock className="h-4 w-4" />
               </div>
               <input
@@ -205,7 +213,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="block w-full rounded-lg border border-white/[0.1] bg-[#171719] py-2.5 pr-3 pl-10 text-xs text-white placeholder:text-[#64646D] focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -213,7 +221,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#D71932] py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-[#b01328] disabled:opacity-50 transition-colors"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#D71932] py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-[0_0_15px_rgba(215,25,50,0.35)] hover:bg-[#b01328] disabled:opacity-50 transition-colors"
           >
             {loading ? (
               <>
@@ -229,10 +237,10 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="border-t border-neutral-200 pt-4 text-center text-xs text-neutral-500 dark:border-neutral-800">
+        <div className="border-t border-white/[0.08] pt-4 text-center text-xs text-[#A5A5AD]">
           <p>
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[#D71932] hover:underline">
+            <Link href="/login" className="font-bold text-[#D71932] hover:underline">
               Sign In here
             </Link>
           </p>

@@ -87,62 +87,62 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <Link
           href="/admin/conversations"
-          className="group rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 shadow-xs hover:border-blue-500 transition-colors"
+          className="group rounded-2xl border border-white/[0.08] bg-[#101012] p-6 shadow-xs hover:border-[#D71932]/50 hover:bg-[#171719] transition-all"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Assigned Chats</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-semibold text-[#A5A5AD] uppercase tracking-wider">Assigned Chats</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-950/60 text-blue-400 group-hover:scale-110 transition-transform">
               <Inbox className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <p className="mt-3 text-3xl font-extrabold tracking-tight text-white">
             {totalAssigned}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">Active conversations assigned to your queue &rarr;</p>
+          <p className="mt-1 text-xs text-[#A5A5AD]">Active conversations assigned to your queue &rarr;</p>
         </Link>
 
         <Link
           href="/admin/contact-requests"
-          className="group rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 shadow-xs hover:border-amber-500 transition-colors"
+          className="group rounded-2xl border border-white/[0.08] bg-[#101012] p-6 shadow-xs hover:border-amber-500/50 hover:bg-[#171719] transition-all"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Pending Inquiries</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-semibold text-[#A5A5AD] uppercase tracking-wider">Pending Inquiries</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-950/60 text-amber-400 group-hover:scale-110 transition-transform">
               <Mail className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <p className="mt-3 text-3xl font-extrabold tracking-tight text-white">
             {totalInquiries}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">Unresolved guest contact submissions &rarr;</p>
+          <p className="mt-1 text-xs text-[#A5A5AD]">Unresolved guest contact submissions &rarr;</p>
         </Link>
 
         <Link
           href="/admin/posts"
-          className="group rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 shadow-xs hover:border-emerald-500 transition-colors"
+          className="group rounded-2xl border border-white/[0.08] bg-[#101012] p-6 shadow-xs hover:border-emerald-500/50 hover:bg-[#171719] transition-all"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">CMS Articles</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-semibold text-[#A5A5AD] uppercase tracking-wider">CMS Articles</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-950/60 text-emerald-400 group-hover:scale-110 transition-transform">
               <BookOpen className="h-4 w-4" />
             </div>
           </div>
-          <p className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <p className="mt-3 text-3xl font-extrabold tracking-tight text-white">
             {totalPosts}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">Database published and draft posts &rarr;</p>
+          <p className="mt-1 text-xs text-[#A5A5AD]">Database published and draft posts &rarr;</p>
         </Link>
       </div>
 
       {/* Content Management & Publishing Hub (Prominently displayed) */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-neutral-200 dark:border-neutral-800 gap-3">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#101012] p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-white/[0.08] gap-3">
           <div>
-            <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
               <FileText className="h-4 w-4 text-[#D71932]" />
               <span>CMS Posts & Media Articles</span>
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-[#A5A5AD]">
               Publish news, blogs, and posters to Sandy&apos;s Gaming website.
             </p>
           </div>
@@ -157,7 +157,7 @@ export default async function AdminDashboardPage() {
             </Link>
             <Link
               href="/admin/posts"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.1] bg-[#171719] px-3 py-1.5 text-xs font-semibold text-[#A5A5AD] hover:text-white hover:border-[#D71932] transition-colors"
             >
               <span>View All ({totalPosts})</span>
             </Link>
@@ -182,17 +182,17 @@ export default async function AdminDashboardPage() {
             />
           </div>
         ) : (
-          <div className="mt-4 divide-y divide-neutral-200 dark:divide-neutral-800">
+          <div className="mt-4 divide-y divide-white/[0.06]">
             {recentPosts.map((post) => {
               const publicUrl = post.post_type === 'blog' ? `/blog/${post.slug}` : `/posts/${post.slug}`;
               return (
                 <div
                   key={post.id}
-                  className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-neutral-50/50 dark:hover:bg-neutral-800/40 px-2 rounded-xl transition-colors"
+                  className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-[#171719] px-3 rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {post.cover_image ? (
-                      <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+                      <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-[#171719] border border-white/[0.08]">
                         <Image
                           src={post.cover_image}
                           alt=""
@@ -203,30 +203,30 @@ export default async function AdminDashboardPage() {
                         />
                       </div>
                     ) : (
-                      <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-400">
+                      <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-lg bg-[#171719] border border-white/[0.08] text-neutral-400">
                         <FileText className="h-5 w-5" />
                       </div>
                     )}
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-neutral-900 dark:text-white truncate">
+                        <h3 className="text-sm font-semibold text-white truncate">
                           {post.title}
                         </h3>
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                             post.status === 'published'
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-500/20'
-                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-500/20'
+                              ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-amber-950/60 text-amber-400 border border-amber-500/20'
                           }`}
                         >
                           {post.status}
                         </span>
-                        <span className="text-[10px] uppercase font-semibold text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] uppercase font-semibold text-neutral-400 bg-white/[0.06] px-1.5 py-0.5 rounded">
                           {post.post_type}
                         </span>
                       </div>
-                      <p className="text-xs text-neutral-500 truncate mt-0.5 font-mono">
+                      <p className="text-xs text-[#A5A5AD] truncate mt-0.5 font-mono">
                         /{post.slug} &bull; {new Date(post.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -237,7 +237,7 @@ export default async function AdminDashboardPage() {
                       <Link
                         href={publicUrl}
                         target="_blank"
-                        className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-600 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300"
+                        className="inline-flex items-center gap-1 rounded-lg border border-white/[0.1] bg-[#171719] px-2.5 py-1 text-xs font-medium text-[#A5A5AD] hover:text-white hover:border-white/[0.2]"
                         title="View Public Post"
                       >
                         <ExternalLink className="h-3 w-3" />
@@ -246,7 +246,7 @@ export default async function AdminDashboardPage() {
                     )}
                     <Link
                       href={`/admin/posts/${post.id}/edit`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-neutral-900 px-3 py-1 text-xs font-semibold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900"
+                      className="inline-flex items-center gap-1 rounded-lg bg-[#D71932] px-3 py-1 text-xs font-semibold text-white hover:bg-[#b01328] transition-colors"
                     >
                       <Edit className="h-3 w-3" />
                       <span>Edit</span>
@@ -261,11 +261,11 @@ export default async function AdminDashboardPage() {
 
       {/* Operational Modules (Live Chat & Contact) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 shadow-xs">
-          <h2 className="text-base font-semibold text-neutral-900 dark:text-white mb-1">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#101012] p-6 shadow-xs">
+          <h2 className="text-base font-semibold text-white mb-1">
             Assigned Live Chats (Shared Model)
           </h2>
-          <p className="text-xs text-neutral-500 mb-6">
+          <p className="text-xs text-[#A5A5AD] mb-6">
             Real-time chat threads currently assigned to your specialist queue. Multiple admins can participate simultaneously.
           </p>
           {totalAssigned === 0 ? (
@@ -276,7 +276,7 @@ export default async function AdminDashboardPage() {
             />
           ) : (
             <div className="space-y-4">
-              <p className="text-xs text-neutral-600 dark:text-neutral-400">
+              <p className="text-xs text-[#A5A5AD]">
                 You have {totalAssigned} active conversation(s) assigned to your queue.
               </p>
               <Link
@@ -289,11 +289,11 @@ export default async function AdminDashboardPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 shadow-xs">
-          <h2 className="text-base font-semibold text-neutral-900 dark:text-white mb-1">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#101012] p-6 shadow-xs">
+          <h2 className="text-base font-semibold text-white mb-1">
             Guest Contact Requests
           </h2>
-          <p className="text-xs text-neutral-500 mb-6">
+          <p className="text-xs text-[#A5A5AD] mb-6">
             Submissions received from the public Contact Us form for staff triage and email response.
           </p>
           {totalInquiries === 0 ? (
@@ -304,10 +304,10 @@ export default async function AdminDashboardPage() {
             />
           ) : (
             <div className="space-y-4">
-              <p className="text-xs text-neutral-600">You have {totalInquiries} pending inquiry request(s).</p>
+              <p className="text-xs text-[#A5A5AD]">You have {totalInquiries} pending inquiry request(s).</p>
               <Link
                 href="/admin/contact-requests"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 dark:border-neutral-700 px-4 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.1] bg-[#171719] px-4 py-2 text-xs font-semibold text-[#A5A5AD] hover:text-white hover:border-[#D71932] transition-colors"
               >
                 <span>View Contact Requests</span>
               </Link>

@@ -3,8 +3,9 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { Mail, Phone, Lock, KeyRound, ArrowRight, Shield, AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import { Mail, Phone, Lock, KeyRound, ArrowRight, Shield, AlertCircle, CheckCircle2, Loader2, User } from 'lucide-react';
 
 type ChannelType = 'email' | 'phone';
 type AuthMode = 'password' | 'otp';
@@ -180,8 +181,15 @@ function LoginContent() {
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-6 rounded-2xl border border-white/[0.08] bg-[#101012] p-8 shadow-2xl">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#D71932] text-white shadow-[0_0_20px_rgba(215,25,50,0.4)]">
-            <Shield className="h-6 w-6" />
+          <div className="mx-auto relative h-16 w-16 rounded-2xl overflow-hidden border border-[#D71932]/40 bg-[#171719] flex items-center justify-center shadow-[0_0_25px_rgba(215,25,50,0.35)] p-2">
+            <Image
+              src="/brand/sandys-gaming-logo.png"
+              alt="Sandy's Gaming"
+              width={56}
+              height={56}
+              className="object-contain"
+              priority
+            />
           </div>
           <h1 className="mt-4 text-2xl font-black uppercase tracking-wider text-white">
             Sign In to Sandy&apos;s Gaming
@@ -412,7 +420,7 @@ function LoginContent() {
         {/* Quick Test Accounts Autofill Helper */}
         <div className="rounded-xl border border-white/[0.08] bg-[#171719] p-3 text-xs">
           <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#A5A5AD]">
-            <Sparkles className="h-3.5 w-3.5 text-[#D71932]" />
+            <User className="h-3.5 w-3.5 text-[#D71932]" />
             <span>Test Personas (Click to autofill):</span>
           </div>
           <div className="mt-2.5 grid grid-cols-3 gap-1.5">

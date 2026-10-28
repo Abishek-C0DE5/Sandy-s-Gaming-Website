@@ -150,29 +150,51 @@ export function StaffChatClient({
           };
           if (!newMsg || !newMsg.id) return;
 
+          const isSelf = newMsg.sender_id === currentUser.id;
+          const formattedMsg: StaffChatMessage = {
+            id: newMsg.id,
+            conversation_id: newMsg.conversation_id,
+            sender_id: newMsg.sender_id,
+            body: newMsg.body,
+            message_type: newMsg.message_type,
+            created_at: newMsg.created_at,
+            is_self: isSelf,
+            sender_name: isSelf ? 'You' : (conversation.customer?.display_name || 'Customer'),
+            sender_role: isSelf ? currentUser.role : 'customer',
+            status: 'sent',
+          };
+
           setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
-
-            const isSelf = newMsg.sender_id === currentUser.id;
-            const formattedMsg: StaffChatMessage = {
-              id: newMsg.id,
-              conversation_id: newMsg.conversation_id,
-              sender_id: newMsg.sender_id,
-              body: newMsg.body,
-              message_type: newMsg.message_type,
-              created_at: newMsg.created_at,
-              is_self: isSelf,
-              sender_name: isSelf ? 'You' : (conversation.customer?.display_name || 'Customer'),
-              sender_role: isSelf ? currentUser.role : 'customer',
-              status: 'sent',
-            };
-
-            const pendingIndex = prev.findIndex(
-              (m) => m.status === 'pending' && m.body === newMsg.body && isSelf
-            );
-            if (pendingIndex !== -1) {
+            // 1. Direct ID match
+            const idxById = prev.findIndex((m) => m.id === newMsg.id);
+            if (idxById !== -1) {
               const updated = [...prev];
-              updated[pendingIndex] = formattedMsg;
+              updated[idxById] = { ...updated[idxById], ...formattedMsg, status: 'sent' };
+              return updated;
+            }
+
+            // 2. Pending optimistic match for self
+            if (isSelf) {
+              const pendingIdx = prev.findIndex(
+                (m) => m.status === 'pending' && m.body.trim() === newMsg.body.trim()
+              );
+              if (pendingIdx !== -1) {
+                const updated = [...prev];
+                updated[pendingIdx] = { ...updated[pendingIdx], ...formattedMsg, status: 'sent' };
+                return updated;
+              }
+            }
+
+            // 3. Peer match by body + recent timestamp (bridges broadcast tempId vs DB UUID)
+            const idxByContent = prev.findIndex(
+              (m) =>
+                m.body.trim() === newMsg.body.trim() &&
+                m.is_self === isSelf &&
+                Math.abs(new Date(m.created_at).getTime() - new Date(newMsg.created_at).getTime()) < 15000
+            );
+            if (idxByContent !== -1) {
+              const updated = [...prev];
+              updated[idxByContent] = { ...updated[idxByContent], ...formattedMsg, status: 'sent' };
               return updated;
             }
 
@@ -198,32 +220,42 @@ export function StaffChatClient({
         }) => {
           const newMsg = response.payload;
           if (!newMsg || !newMsg.id) return;
+          // Ignore own broadcasts: sender already manages optimistic state
+          if (newMsg.sender_id === currentUser.id) return;
+
+          const isSelf = false;
+          const staffSenderName = newMsg.true_sender_name || newMsg.sender_name || 'Staff Specialist';
+
+          const formattedMsg: StaffChatMessage = {
+            id: newMsg.id,
+            conversation_id: newMsg.conversation_id,
+            sender_id: newMsg.sender_id,
+            body: newMsg.body,
+            message_type: newMsg.message_type,
+            created_at: newMsg.created_at,
+            is_self: isSelf,
+            sender_name: newMsg.sender_role === 'customer' ? (newMsg.sender_name || 'Customer') : staffSenderName,
+            sender_role: newMsg.sender_role,
+            status: 'sent',
+          };
 
           setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            // 1. Direct ID match
+            const idxById = prev.findIndex((m) => m.id === newMsg.id);
+            if (idxById !== -1) {
+              return prev;
+            }
 
-            const isSelf = newMsg.sender_id === currentUser.id;
-            const staffSenderName = newMsg.true_sender_name || newMsg.sender_name || 'Staff Specialist';
-
-            const formattedMsg: StaffChatMessage = {
-              id: newMsg.id,
-              conversation_id: newMsg.conversation_id,
-              sender_id: newMsg.sender_id,
-              body: newMsg.body,
-              message_type: newMsg.message_type,
-              created_at: newMsg.created_at,
-              is_self: isSelf,
-              sender_name: isSelf ? 'You' : newMsg.sender_role === 'customer' ? (newMsg.sender_name || 'Customer') : staffSenderName,
-              sender_role: newMsg.sender_role,
-              status: 'sent',
-            };
-
-            const pendingIndex = prev.findIndex(
-              (m) => m.status === 'pending' && m.body === newMsg.body && isSelf
+            // 2. Peer match by body + recent timestamp
+            const idxByContent = prev.findIndex(
+              (m) =>
+                m.body.trim() === newMsg.body.trim() &&
+                m.is_self === isSelf &&
+                Math.abs(new Date(m.created_at).getTime() - new Date(newMsg.created_at).getTime()) < 15000
             );
-            if (pendingIndex !== -1) {
+            if (idxByContent !== -1) {
               const updated = [...prev];
-              updated[pendingIndex] = formattedMsg;
+              updated[idxByContent] = { ...updated[idxByContent], ...formattedMsg, status: 'sent' };
               return updated;
             }
 
