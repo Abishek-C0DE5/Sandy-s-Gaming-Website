@@ -4,15 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Heart,
-  MessageCircle,
-  Share2,
-  Check,
   Flame,
   Globe,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
   BookOpen,
   ImageIcon,
 } from 'lucide-react';
@@ -73,8 +68,6 @@ const DEFAULT_POSTS: FeedPost[] = [
 
 export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] }) {
   const [filter, setFilter] = useState<'all' | 'blog' | 'gallery'>('all');
-  const [likesState, setLikesState] = useState<Record<string, { count: number; active: boolean }>>({});
-  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
 
   // Combine real database posts with fallbacks if empty
   const posts = initialPosts.length > 0 ? initialPosts : DEFAULT_POSTS;
@@ -84,30 +77,6 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
     if (filter === 'gallery') return p.post_type === 'poster' || p.post_type === 'photo';
     return true;
   });
-
-  const handleLike = (postId: string, initialLikes = 120) => {
-    setLikesState((prev) => {
-      const current = prev[postId] || { count: initialLikes, active: false };
-      return {
-        ...prev,
-        [postId]: {
-          count: current.active ? current.count - 1 : current.count + 1,
-          active: !current.active,
-        },
-      };
-    });
-  };
-
-  const handleShare = async (slug: string, postType: PostType) => {
-    const path = postType === 'blog' ? `/blog/${slug}` : `/posts/${slug}`;
-    const url = typeof window !== 'undefined' ? `${window.location.origin}${path}` : path;
-
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
-      setCopiedSlug(slug);
-      setTimeout(() => setCopiedSlug(null), 2500);
-    }
-  };
 
   const formatTimestamp = (dateStr?: string | null) => {
     if (!dateStr) return 'Recently';
@@ -174,14 +143,8 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
 
       {/* Social Feed Items */}
       <div className="space-y-6">
-        {filteredPosts.map((post, idx) => {
+        {filteredPosts.map((post) => {
           const detailUrl = post.post_type === 'blog' ? `/blog/${post.slug}` : `/posts/${post.slug}`;
-          const currentLike = likesState[post.id] || {
-            count: post.initialLikes || 140 + idx * 37,
-            active: false,
-          };
-          const comments = post.commentsCount || 18 + idx * 7;
-          const isCopied = copiedSlug === post.slug;
 
           return (
             <article
@@ -251,66 +214,21 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
                 </Link>
               )}
 
-              {/* Reactions & Engagement Stats */}
-              <div className="px-4 sm:px-5 py-2.5 flex items-center justify-between text-xs text-[#A5A5AD] border-b border-white/[0.04]">
-                <div className="flex items-center gap-1.5">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D71932] text-white">
-                    <Heart className="h-3 w-3 fill-white" />
+              {/* Clean Gaming Card Action Footer */}
+              <div className="p-4 sm:p-5 flex items-center justify-between border-t border-white/[0.04] bg-[#0c0c0e]">
+                <div className="flex items-center gap-2 text-xs text-[#A5A5AD]">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-neutral-400">
+                    {post.post_type === 'blog' ? 'Editorial Article' : 'Media Asset'}
                   </span>
-                  <span>{currentLike.count} reactions</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span>{comments} comments</span>
-                  <span>&bull;</span>
-                  <span>{Math.floor(currentLike.count / 4)} shares</span>
-                </div>
-              </div>
 
-              {/* Facebook-style Action Bar */}
-              <div className="px-3 py-1.5 grid grid-cols-3 gap-1">
-                {/* Like Button */}
-                <button
-                  type="button"
-                  onClick={() => handleLike(post.id, currentLike.count)}
-                  className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
-                    currentLike.active
-                      ? 'text-[#D71932] bg-[#D71932]/10'
-                      : 'text-[#A5A5AD] hover:text-white hover:bg-[#171719]'
-                  }`}
-                >
-                  <Heart
-                    className={`h-4 w-4 ${currentLike.active ? 'fill-[#D71932] text-[#D71932]' : ''}`}
-                  />
-                  <span>Like</span>
-                </button>
-
-                {/* Comment Button */}
                 <Link
                   href={detailUrl}
-                  className="flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold text-[#A5A5AD] hover:text-white hover:bg-[#171719] transition-all"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#171719] border border-white/[0.08] px-4 py-2 text-xs font-bold text-white hover:bg-[#D71932] hover:border-[#D71932] transition-all transform hover:-translate-y-0.5 group"
                 >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>Comment</span>
+                  <span>{post.post_type === 'blog' ? 'Read Full Intel' : 'View High-Res Artwork'}</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </Link>
-
-                {/* Share Button */}
-                <button
-                  type="button"
-                  onClick={() => handleShare(post.slug, post.post_type)}
-                  className="flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold text-[#A5A5AD] hover:text-white hover:bg-[#171719] transition-all"
-                >
-                  {isCopied ? (
-                    <>
-                      <Check className="h-4 w-4 text-emerald-400" />
-                      <span className="text-emerald-400">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="h-4 w-4" />
-                      <span>Share</span>
-                    </>
-                  )}
-                </button>
               </div>
             </article>
           );

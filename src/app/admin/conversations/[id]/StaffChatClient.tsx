@@ -173,10 +173,10 @@ export function StaffChatClient({
               return updated;
             }
 
-            // 2. Pending optimistic match for self
+            // 2. Optimistic match for self (bridges temp ID vs DB UUID)
             if (isSelf) {
               const pendingIdx = prev.findIndex(
-                (m) => m.status === 'pending' && m.body.trim() === newMsg.body.trim()
+                (m) => (m.status === 'pending' || m.id.startsWith('temp-')) && m.body.trim() === newMsg.body.trim()
               );
               if (pendingIdx !== -1) {
                 const updated = [...prev];
@@ -325,10 +325,10 @@ export function StaffChatClient({
     }
   };
 
-  // Send message as Staff
+  // Send message as Staff (Non-blocking background delivery)
   const handleSendMessage = async (textToSend?: string, retryId?: string) => {
     const text = (textToSend !== undefined ? textToSend : inputText).trim();
-    if (!text || isSending) return;
+    if (!text) return;
 
     if (text.length > 5000) {
       setErrorBanner('Message is too long. Limit is 5000 characters.');
@@ -336,10 +336,9 @@ export function StaffChatClient({
     }
 
     setErrorBanner(null);
-    setIsSending(true);
 
     // eslint-disable-next-line react-hooks/purity
-    const tempId = retryId || `temp-${Date.now()}`;
+    const tempId = retryId || `temp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const optimisticMessage: StaffChatMessage = {
       id: tempId,
       conversation_id: conversationId,
@@ -349,12 +348,12 @@ export function StaffChatClient({
       is_self: true,
       sender_name: 'You',
       sender_role: currentUser.role,
-      status: 'pending',
+      status: 'sent',
     };
 
     if (retryId) {
       setMessages((prev) =>
-        prev.map((m) => (m.id === retryId ? { ...m, status: 'pending', errorDetails: undefined } : m))
+        prev.map((m) => (m.id === retryId ? { ...m, status: 'sent', errorDetails: undefined } : m))
       );
     } else {
       setMessages((prev) => [...prev, optimisticMessage]);
@@ -383,6 +382,7 @@ export function StaffChatClient({
       // Fallback silently to HTTP persistence
     }
 
+    // Perform background database persistence
     try {
       const res = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: 'POST',
@@ -424,8 +424,6 @@ export function StaffChatClient({
         )
       );
       setErrorBanner(errText);
-    } finally {
-      setIsSending(false);
     }
   };
 
@@ -699,36 +697,18 @@ export function StaffChatClient({
                     {msg.body}
                   </div>
 
-                  {/* Outgoing status */}
-                  {isSelf && (
-                    <div className="mt-1 flex items-center gap-1 px-1 text-[10px] text-neutral-400">
-                      {msg.status === 'pending' && (
-                        <span className="inline-flex items-center gap-1 text-neutral-500">
-                          <Clock className="h-3 w-3 animate-spin" />
-                          <span>Sending...</span>
-                        </span>
-                      )}
-
-                      {msg.status === 'failed' && (
-                        <div className="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 font-medium">
-                          <span>Failed to send</span>
-                          <button
-                            type="button"
-                            onClick={() => handleSendMessage(msg.body, msg.id)}
-                            className="inline-flex items-center gap-0.5 underline hover:text-red-700 ml-1"
-                          >
-                            <RotateCcw className="h-2.5 w-2.5" />
-                            <span>Retry</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {(!msg.status || msg.status === 'sent') && (
-                        <span className="inline-flex items-center gap-1 text-neutral-400 dark:text-neutral-500">
-                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                          <span>Sent</span>
-                        </span>
-                      )}
+                  {/* Outgoing status: only show retry button if transmission failed */}
+                  {isSelf && msg.status === 'failed' && (
+                    <div className="mt-1 flex items-center gap-1.5 px-1 text-[10px] text-red-500 font-medium">
+                      <span>Failed to send</span>
+                      <button
+                        type="button"
+                        onClick={() => handleSendMessage(msg.body, msg.id)}
+                        className="inline-flex items-center gap-0.5 underline hover:text-red-400 ml-1"
+                      >
+                        <RotateCcw className="h-2.5 w-2.5" />
+                        <span>Retry</span>
+                      </button>
                     </div>
                   )}
                 </div>
