@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import type { Database, UserRole } from '@/types/database';
 import { redirect } from 'next/navigation';
@@ -6,9 +7,9 @@ export type Profile = Database['public']['Tables']['profiles']['Row'];
 
 /**
  * Retrieves the currently authenticated Supabase Auth user.
- * Returns null if no active session exists.
+ * Memoized per request using React cache() to prevent redundant network calls.
  */
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,13 +21,13 @@ export async function getCurrentUser() {
   }
 
   return user;
-}
+});
 
 /**
  * Retrieves the application profile for the current authenticated user.
- * Queries PostgreSQL profiles table directly to prevent JWT tampering.
+ * Memoized per request to eliminate duplicate database queries.
  */
-export async function getCurrentProfile(): Promise<Profile | null> {
+export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
   const user = await getCurrentUser();
   if (!user) return null;
 
@@ -42,24 +43,24 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   }
 
   return profile;
-}
+});
 
 /**
  * Enforces authentication. If unauthenticated, redirects to /login.
  */
 export async function requireAuth(redirectTo: string = '/login') {
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect(redirectTo);
-  }
-
   const profile = await getCurrentProfile();
   if (!profile) {
-    redirect('/login?error=Profile%20not%20found');
+    redirect(redirectTo);
   }
 
   if (profile.account_status === 'suspended') {
     redirect('/suspended');
+  }
+
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect(redirectTo);
   }
 
   return user;

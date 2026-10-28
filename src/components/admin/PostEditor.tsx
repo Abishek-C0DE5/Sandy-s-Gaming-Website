@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,13 @@ import {
   BookOpen,
   Camera,
   Layers,
+  Bold,
+  Italic,
+  Heading2,
+  Quote,
+  List,
+  Code,
+  Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -58,6 +65,7 @@ function slugify(text: string): string {
 
 export function PostEditor({ initialData, isEditMode = false }: PostEditorProps) {
   const router = useRouter();
+  const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
@@ -99,7 +107,26 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
     }
   };
 
-  // Upload cover image
+  // Quick formatting insert helper
+  const insertFormatting = (prefix: string, suffix: string = '', defaultText: string = '') => {
+    const textarea = bodyTextareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = body.substring(start, end) || defaultText;
+    const replacement = `${prefix}${selectedText}${suffix}`;
+
+    const newBody = body.substring(0, start) + replacement + body.substring(end);
+    setBody(newBody);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
+    }, 10);
+  };
+
+  // Upload cover image directly to public storage
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -120,7 +147,6 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
     try {
       const formData = new FormData();
       formData.append('file', file);
-      // Ensure media is stored permanently in public storage for post rendering
       formData.append('isDraft', 'false');
       formData.append('folder', 'covers');
 
@@ -135,7 +161,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
       }
 
       setCoverImage(data.url);
-      setSuccessMsg(`Cover image uploaded to ${data.bucket} successfully.`);
+      setSuccessMsg('Cover image uploaded successfully to storage!');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Upload error';
       setError(msg);
@@ -257,11 +283,10 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
           : `Post successfully created as ${finalStatus}!`
       );
 
-      // Brief delay so user sees confirmation before navigation
       setTimeout(() => {
         router.push('/admin/posts');
         router.refresh();
-      }, 700);
+      }, 600);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Submission failed';
       setError(msg);
@@ -296,7 +321,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-16">
+    <div className="space-y-6 max-w-5xl mx-auto pb-20">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-4">
         <div className="flex items-center gap-3">
@@ -308,12 +333,10 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
           </Link>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              {isEditMode ? 'Edit Content Post' : 'Create New Content Post'}
+              {isEditMode ? 'Edit Post' : 'Create New Post'}
             </h1>
             <p className="text-xs text-neutral-500">
-              {isEditMode
-                ? 'Update copy, replace media, or change publishing visibility.'
-                : 'Author blog articles, poster showcases, or photography releases.'}
+              Compose articles, upload artwork, and publish live to Sandy&apos;s Gaming.
             </p>
           </div>
         </div>
@@ -361,7 +384,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
             ) : (
               <CheckCircle2 className="h-4 w-4 mr-1.5" />
             )}
-            <span>Publish Now</span>
+            <span>Publish Post</span>
           </Button>
         </div>
       </div>
@@ -379,410 +402,461 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Editor (2 cols) */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Post Type Selector */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-              Post Content Type
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { type: 'blog', label: 'Blog Article', icon: BookOpen, desc: 'Rich articles & updates' },
-                { type: 'poster', label: 'Poster Showcase', icon: Layers, desc: 'Graphic designs & banners' },
-                { type: 'photo', label: 'Photography', icon: Camera, desc: 'Visual galleries & captures' },
-              ].map((item) => {
-                const Icon = item.icon;
-                const isSelected = postType === item.type;
-                return (
-                  <button
-                    key={item.type}
-                    type="button"
-                    onClick={() => setPostType(item.type as 'blog' | 'poster' | 'photo')}
-                    className={`flex flex-col items-center text-center p-3 rounded-xl border transition-all ${
-                      isSelected
-                        ? 'border-blue-600 bg-blue-50/50 text-blue-700 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-300 shadow-xs'
-                        : 'border-neutral-200 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 mb-1.5" />
-                    <span className="text-xs font-semibold">{item.label}</span>
-                    <span className="text-[10px] text-neutral-500 mt-0.5">{item.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+      {/* 1. Post Type Selector (Clean Pill Grid) */}
+      <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+          Content Category
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { type: 'blog', label: 'Blog Article', icon: BookOpen, desc: 'News, meta guides & tournament updates' },
+            { type: 'poster', label: 'Tournament Poster', icon: Layers, desc: 'Showcase banners & schedule graphics' },
+            { type: 'photo', label: 'Esports Photography', icon: Camera, desc: 'Event photography & high-res captures' },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isSelected = postType === item.type;
+            return (
+              <button
+                key={item.type}
+                type="button"
+                onClick={() => setPostType(item.type as 'blog' | 'poster' | 'photo')}
+                className={`flex flex-col items-center text-center p-3 rounded-xl border transition-all cursor-pointer ${
+                  isSelected
+                    ? 'border-[#D71932] bg-[#D71932]/10 text-[#D71932] dark:border-[#D71932] dark:bg-[#D71932]/15 shadow-xs font-semibold'
+                    : 'border-neutral-200 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400'
+                }`}
+              >
+                <Icon className="h-5 w-5 mb-1.5" />
+                <span className="text-xs">{item.label}</span>
+                <span className="text-[10px] text-neutral-400 mt-0.5 line-clamp-1">{item.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-          {/* Title and Slug */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 space-y-4">
-            <div>
-              <label htmlFor="post-title" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                Title <span className="text-red-500">*</span>
+      {/* 2. Main Title, Slug & Summary Card */}
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 space-y-4">
+        <div>
+          <label htmlFor="post-title" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            Post Title <span className="text-[#D71932]">*</span>
+          </label>
+          <input
+            id="post-title"
+            type="text"
+            value={title}
+            onChange={handleTitleChange}
+            placeholder="e.g. Valorant Champions 2026: Tactical Breakdown & Player Highlights"
+            className="mt-1.5 w-full rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-base font-semibold text-neutral-900 focus:border-[#D71932] focus:outline-hidden focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="post-slug" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                URL Slug <span className="text-[#D71932]">*</span>
               </label>
+              <button
+                type="button"
+                onClick={() => setAutoSlug(!autoSlug)}
+                className="text-[11px] text-[#D71932] hover:underline cursor-pointer"
+              >
+                {autoSlug ? 'Auto-synced' : 'Set manually'}
+              </button>
+            </div>
+            <div className="mt-1.5 flex items-center rounded-xl border border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/80 px-3 py-2">
+              <span className="text-xs text-neutral-400 font-mono">
+                {postType === 'blog' ? '/blog/' : '/posts/'}
+              </span>
               <input
-                id="post-title"
+                id="post-slug"
                 type="text"
-                value={title}
-                onChange={handleTitleChange}
-                placeholder="e.g. Next-Gen Gaming Performance Breakthroughs"
-                className="mt-1.5 w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="post-slug" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  URL Slug <span className="text-red-500">*</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setAutoSlug(!autoSlug)}
-                  className="text-[11px] text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  {autoSlug ? 'Switch to manual slug' : 'Sync slug with title'}
-                </button>
-              </div>
-              <div className="mt-1.5 flex items-center rounded-lg border border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800">
-                <span className="px-3 text-xs text-neutral-400 font-mono">
-                  {postType === 'blog' ? '/blog/' : '/posts/'}
-                </span>
-                <input
-                  id="post-slug"
-                  type="text"
-                  value={slug}
-                  onChange={(e) => {
-                    setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-                    setAutoSlug(false);
-                  }}
-                  placeholder="post-url-slug"
-                  className="w-full bg-transparent py-2 pr-3 text-xs font-mono text-neutral-900 focus:outline-none dark:text-white"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="post-excerpt" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                Summary / Excerpt
-              </label>
-              <textarea
-                id="post-excerpt"
-                rows={2}
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                placeholder="A concise synopsis displayed on post preview cards and search engines..."
-                className="mt-1.5 w-full rounded-lg border border-neutral-300 bg-white p-3 text-xs text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                value={slug}
+                onChange={(e) => {
+                  setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+                  setAutoSlug(false);
+                }}
+                placeholder="post-slug"
+                className="w-full bg-transparent text-xs font-mono text-neutral-900 focus:outline-hidden dark:text-white ml-0.5"
               />
             </div>
           </div>
 
-          {/* Body Content Editor & Live Preview */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3 dark:border-neutral-800">
-              <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                Article Body Content
-              </label>
-              <div className="inline-flex rounded-lg border border-neutral-200 bg-neutral-50 p-0.5 text-xs dark:border-neutral-700 dark:bg-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('write')}
-                  className={`rounded-md px-3 py-1 font-medium transition-colors ${
-                    activeTab === 'write'
-                      ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                      : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
-                  }`}
-                >
-                  Markdown Editor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('preview')}
-                  className={`flex items-center gap-1 rounded-md px-3 py-1 font-medium transition-colors ${
-                    activeTab === 'preview'
-                      ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                      : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
-                  }`}
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  <span>Preview</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              {activeTab === 'write' ? (
-                <textarea
-                  rows={14}
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  placeholder="Write post content using Markdown formatting (# Headings, **bold**, lists, etc.)..."
-                  className="w-full rounded-lg border border-neutral-300 bg-white p-3.5 font-mono text-xs text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
-                />
-              ) : (
-                <div className="min-h-[350px] rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs dark:border-neutral-800 dark:bg-neutral-900/50">
-                  {body ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                      {body}
-                    </div>
-                  ) : (
-                    <p className="text-neutral-400 italic">No content written yet. Switch to Editor to compose.</p>
-                  )}
-                </div>
-              )}
+          <div>
+            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+              Publish Status
+            </label>
+            <div className="mt-1.5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setStatus('draft')}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  status === 'draft'
+                    ? 'border-amber-500 bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'
+                }`}
+              >
+                Draft (Hidden)
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus('published')}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  status === 'published'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                    : 'border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'
+                }`}
+              >
+                Published (Live)
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Sidebar Configuration (1 col) */}
-        <div className="space-y-6">
-          {/* Status & Visibility */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-            <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
-              Publishing Status
+        <div>
+          <label htmlFor="post-excerpt" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            Summary / Short Excerpt
+          </label>
+          <textarea
+            id="post-excerpt"
+            rows={2}
+            value={excerpt}
+            onChange={(e) => setExcerpt(e.target.value)}
+            placeholder="A compelling 1-2 sentence synopsis shown on cards and search engines..."
+            className="mt-1.5 w-full rounded-xl border border-neutral-300 bg-white p-3 text-xs text-neutral-900 focus:border-[#D71932] focus:outline-hidden focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+          />
+        </div>
+      </div>
+
+      {/* 3. Cover Media Upload Card */}
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-1.5">
+              <ImageIcon className="h-4 w-4 text-[#D71932]" />
+              <span>Cover Image</span>
             </h3>
-            <div className="space-y-2">
-              {[
-                { val: 'draft', label: 'Draft', desc: 'Private to staff; protected in draft-media.' },
-                { val: 'published', label: 'Published', desc: 'Visible on public website.' },
-                ...(isEditMode
-                  ? [{ val: 'archived', label: 'Archived', desc: 'Hidden from public listings.' }]
-                  : []),
-              ].map((item) => (
-                <label
-                  key={item.val}
-                  className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-colors ${
-                    status === item.val
-                      ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 dark:border-blue-500'
-                      : 'border-neutral-200 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/40'
-                  }`}
+            <p className="text-xs text-neutral-500">Featured banner displayed on article headers and list cards.</p>
+          </div>
+          <span className="text-[11px] text-neutral-400">Max 5MB (JPG, PNG, WebP)</span>
+        </div>
+
+        {coverImage ? (
+          <div className="space-y-3">
+            <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
+              <Image
+                src={coverImage}
+                alt="Cover preview"
+                fill
+                sizes="(max-width: 1024px) 100vw, 800px"
+                className="object-cover"
+                unoptimized
+              />
+            </div>
+            <div className="flex items-center justify-between text-xs px-1">
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>Cover Image Connected</span>
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('cover-file-input')?.click()}
+                  className="text-blue-600 dark:text-blue-400 font-semibold hover:underline cursor-pointer"
                 >
-                  <input
-                    type="radio"
-                    name="post_status"
-                    value={item.val}
-                    checked={status === item.val}
-                    onChange={() => setStatus(item.val as 'draft' | 'published' | 'archived')}
-                    className="mt-0.5 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div>
-                    <div className="text-xs font-semibold capitalize text-neutral-900 dark:text-white">
-                      {item.label}
-                    </div>
-                    <div className="text-[11px] text-neutral-500 mt-0.5">{item.desc}</div>
-                  </div>
-                </label>
-              ))}
+                  Replace Image
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoverImage(null)}
+                  className="text-red-600 dark:text-red-400 font-semibold hover:underline cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Cover Media Asset */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                Cover Image
-              </h3>
-              <span className="text-[11px] text-neutral-400">Max 5MB (JPG, PNG, WebP)</span>
+        ) : (
+          <div className="space-y-3">
+            <div className="rounded-xl border-2 border-dashed border-neutral-300 p-6 text-center hover:border-[#D71932]/50 dark:border-neutral-700 dark:hover:border-[#D71932]/50 transition-colors bg-neutral-50/50 dark:bg-neutral-800/30">
+              <input
+                id="cover-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                onChange={handleCoverUpload}
+                disabled={uploadingCover}
+                className="hidden"
+              />
+              <div className="flex flex-col items-center">
+                {uploadingCover ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-[#D71932]" />
+                ) : (
+                  <Upload className="h-8 w-8 text-neutral-400" />
+                )}
+                <span className="mt-2 text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                  {uploadingCover ? 'Uploading to Supabase Storage...' : 'Upload Cover Image'}
+                </span>
+                <p className="mt-0.5 text-xs text-neutral-400">
+                  PNG, JPG, or WebP up to 5MB
+                </p>
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('cover-file-input')?.click()}
+                  disabled={uploadingCover}
+                  className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#D71932] px-5 py-2.5 text-xs font-bold text-white shadow-[0_0_15px_rgba(215,25,50,0.3)] hover:bg-[#b01328] transition-all cursor-pointer"
+                >
+                  <Upload className="h-4 w-4" />
+                  <span>{uploadingCover ? 'Uploading...' : 'Choose Image File'}</span>
+                </button>
+              </div>
             </div>
 
-            {coverImage ? (
-              <div className="space-y-3">
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
-                  <Image
-                    src={coverImage}
-                    alt="Cover preview"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 300px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    <span>Asset Connected</span>
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => document.getElementById('cover-file-input')?.click()}
-                      className="text-blue-500 hover:text-blue-600 text-xs font-medium cursor-pointer"
-                    >
-                      Replace
-                    </button>
-                    <span className="text-neutral-300">&bull;</span>
-                    <button
-                      type="button"
-                      onClick={() => setCoverImage(null)}
-                      className="text-red-500 hover:text-red-600 text-xs font-medium cursor-pointer"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="rounded-xl border-2 border-dashed border-neutral-300 p-5 text-center hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-600 transition-colors bg-neutral-50/50 dark:bg-neutral-800/30">
+            {/* Direct image link option */}
+            <div className="pt-2 flex items-center justify-between">
+              {!showUrlInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput(true)}
+                  className="text-xs text-neutral-500 hover:text-[#D71932] dark:hover:text-white transition-colors cursor-pointer"
+                >
+                  &rarr; Or paste an existing image URL instead
+                </button>
+              ) : (
+                <div className="w-full flex gap-2">
                   <input
-                    id="cover-file-input"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/avif"
-                    onChange={handleCoverUpload}
-                    disabled={uploadingCover}
-                    className="hidden"
+                    type="url"
+                    placeholder="https://images.unsplash.com/photo-..."
+                    value={imageUrlInput}
+                    onChange={(e) => setImageUrlInput(e.target.value)}
+                    className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-xs text-neutral-900 dark:text-white"
                   />
-                  <div className="flex flex-col items-center">
-                    {uploadingCover ? (
-                      <Loader2 className="h-8 w-8 animate-spin text-[#D71932]" />
-                    ) : (
-                      <Upload className="h-8 w-8 text-neutral-400" />
-                    )}
-                    <span className="mt-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                      {uploadingCover ? 'Uploading file to storage...' : 'Cover Image Asset'}
-                    </span>
-                    <p className="mt-0.5 text-[11px] text-neutral-400">
-                      PNG, JPG, WebP up to 5MB
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => document.getElementById('cover-file-input')?.click()}
-                      disabled={uploadingCover}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#D71932] px-4 py-2 text-xs font-bold text-white shadow-[0_0_12px_rgba(215,25,50,0.3)] hover:bg-[#b01328] transition-colors cursor-pointer"
-                    >
-                      <Upload className="h-3.5 w-3.5" />
-                      <span>{uploadingCover ? 'Uploading...' : 'Choose Image File'}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Direct image link option */}
-                <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
-                  {!showUrlInput ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowUrlInput(true)}
-                      className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                    >
-                      Or paste an image URL instead
-                    </button>
-                  ) : (
-                    <div className="space-y-2">
-                      <label className="block text-[11px] font-medium text-neutral-500">Image Web Link</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="url"
-                          placeholder="https://example.com/cover.jpg"
-                          value={imageUrlInput}
-                          onChange={(e) => setImageUrlInput(e.target.value)}
-                          className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2.5 py-1.5 text-xs text-neutral-900 dark:text-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (imageUrlInput.trim()) {
-                              setCoverImage(imageUrlInput.trim());
-                              setImageUrlInput('');
-                              setShowUrlInput(false);
-                            }
-                          }}
-                          className="rounded-lg bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 text-white px-3 py-1.5 text-xs font-semibold shrink-0 cursor-pointer"
-                        >
-                          Attach
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Secondary Gallery Media (for Posters / Photography) */}
-          {(postType === 'poster' || postType === 'photo') && (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  Gallery Showcase Assets
-                </h3>
-                <span className="text-[11px] text-neutral-400">{mediaList.length} items</span>
-              </div>
-
-              {mediaList.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 mb-3">
-                  {mediaList.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="group relative aspect-square rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100 dark:border-neutral-800"
-                    >
-                      {item.url ? (
-                        <Image
-                          src={item.url}
-                          alt=""
-                          fill
-                          sizes="150px"
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center text-[10px] text-neutral-400">
-                          {item.storage_path}
-                        </div>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removeGalleryItem(idx)}
-                        className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="rounded-xl border-2 border-dashed border-neutral-300 p-4 text-center hover:border-neutral-400 dark:border-neutral-700 transition-colors bg-neutral-50/50 dark:bg-neutral-800/30">
-                <input
-                  id="gallery-file-input"
-                  type="file"
-                  multiple
-                  accept="image/jpeg,image/png,image/webp,image/avif"
-                  onChange={handleGalleryUpload}
-                  disabled={uploadingGallery}
-                  className="hidden"
-                />
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <div className="flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                    {uploadingGallery ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-[#D71932]" />
-                    ) : (
-                      <ImageIcon className="h-4 w-4 text-neutral-400" />
-                    )}
-                    <span>{uploadingGallery ? 'Uploading gallery...' : 'Select images for poster showcase'}</span>
-                  </div>
                   <button
                     type="button"
-                    onClick={() => document.getElementById('gallery-file-input')?.click()}
-                    disabled={uploadingGallery}
-                    className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-neutral-800 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-neutral-700 transition-colors cursor-pointer"
+                    onClick={() => {
+                      if (imageUrlInput.trim()) {
+                        setCoverImage(imageUrlInput.trim());
+                        setImageUrlInput('');
+                        setShowUrlInput(false);
+                      }
+                    }}
+                    className="rounded-xl bg-neutral-900 dark:bg-white dark:text-neutral-900 text-white px-4 py-1.5 text-xs font-semibold shrink-0 cursor-pointer"
                   >
-                    <Upload className="h-3.5 w-3.5" />
-                    <span>Browse Gallery Images</span>
+                    Attach
                   </button>
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 4. Rich Article Content Composer */}
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-neutral-200 pb-3 dark:border-neutral-800 gap-3">
+          <div>
+            <label className="text-sm font-bold text-neutral-900 dark:text-white">
+              Article Content
+            </label>
+            <p className="text-xs text-neutral-500">Write your article body. Use the formatting bar or Markdown.</p>
+          </div>
+
+          <div className="inline-flex rounded-xl border border-neutral-200 bg-neutral-50 p-1 text-xs dark:border-neutral-700 dark:bg-neutral-800">
+            <button
+              type="button"
+              onClick={() => setActiveTab('write')}
+              className={`rounded-lg px-3 py-1 font-semibold transition-colors cursor-pointer ${
+                activeTab === 'write'
+                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+              }`}
+            >
+              Write
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('preview')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1 font-semibold transition-colors cursor-pointer ${
+                activeTab === 'preview'
+                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+              }`}
+            >
+              <Eye className="h-3.5 w-3.5" />
+              <span>Live Preview</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Formatting Helper Toolbar */}
+        {activeTab === 'write' && (
+          <div className="mt-3 flex flex-wrap items-center gap-1 rounded-xl bg-neutral-100 p-1.5 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700/60">
+            <button
+              type="button"
+              onClick={() => insertFormatting('## ', '', 'Section Heading')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Heading 2"
+            >
+              <Heading2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormatting('**', '**', 'bold text')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Bold"
+            >
+              <Bold className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormatting('*', '*', 'italic text')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Italic"
+            >
+              <Italic className="h-4 w-4" />
+            </button>
+            <span className="w-px h-4 bg-neutral-300 dark:bg-neutral-700 mx-1" />
+            <button
+              type="button"
+              onClick={() => insertFormatting('> ', '', 'Quoted thought')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Quote block"
+            >
+              <Quote className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormatting('- ', '', 'List item')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Bullet list"
+            >
+              <List className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormatting('```\n', '\n```', 'code block')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Code block"
+            >
+              <Code className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => insertFormatting('[Link title](', ')', 'https://example.com')}
+              className="p-1.5 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 cursor-pointer"
+              title="Hyperlink"
+            >
+              <Link2 className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <div className="mt-3">
+          {activeTab === 'write' ? (
+            <textarea
+              ref={bodyTextareaRef}
+              rows={16}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Start composing your article here... Use headings, bullet points, and code blocks."
+              className="w-full rounded-xl border border-neutral-300 bg-white p-4 font-mono text-sm leading-relaxed text-neutral-900 focus:border-[#D71932] focus:outline-hidden focus:ring-1 focus:ring-[#D71932] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+            />
+          ) : (
+            <div className="min-h-[380px] rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-sm leading-relaxed dark:border-neutral-800 dark:bg-neutral-900/50">
+              {body ? (
+                <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
+                  {body}
+                </div>
+              ) : (
+                <p className="text-neutral-400 italic">No article content yet. Switch to Write mode to compose.</p>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Bottom Sticky Action Bar */}
-      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm">
+      {/* 5. Additional Gallery Media (only if poster or photo) */}
+      {(postType === 'poster' || postType === 'photo') && (
+        <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                Gallery Showcase Assets
+              </h3>
+              <p className="text-xs text-neutral-500">Additional photography captures or high-resolution tournament posters.</p>
+            </div>
+            <span className="text-xs text-neutral-400">{mediaList.length} items</span>
+          </div>
+
+          {mediaList.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+              {mediaList.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="group relative aspect-square rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 dark:border-neutral-800"
+                >
+                  {item.url ? (
+                    <Image
+                      src={item.url}
+                      alt=""
+                      fill
+                      sizes="180px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-[10px] text-neutral-400">
+                      {item.storage_path}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryItem(idx)}
+                    className="absolute top-2 right-2 rounded-full bg-black/70 p-1.5 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    title="Remove item"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="rounded-xl border-2 border-dashed border-neutral-300 p-5 text-center hover:border-[#D71932]/50 dark:border-neutral-700 transition-colors bg-neutral-50/50 dark:bg-neutral-800/30">
+            <input
+              id="gallery-file-input"
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              onChange={handleGalleryUpload}
+              disabled={uploadingGallery}
+              className="hidden"
+            />
+            <div className="flex flex-col items-center justify-center gap-2">
+              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                {uploadingGallery ? 'Uploading gallery photos...' : 'Add multiple images to this gallery post'}
+              </span>
+              <button
+                type="button"
+                onClick={() => document.getElementById('gallery-file-input')?.click()}
+                disabled={uploadingGallery}
+                className="mt-1 inline-flex items-center gap-2 rounded-xl bg-neutral-800 px-4 py-2 text-xs font-semibold text-white hover:bg-neutral-700 transition-colors cursor-pointer"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                <span>Select Photos</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Sticky Bottom Action Bar */}
+      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-md">
         <Link
           href="/admin/posts"
           className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 font-medium"
         >
-          &larr; Cancel & Return to Posts
+          &larr; Cancel &amp; Return to Posts
         </Link>
 
         <div className="flex items-center gap-3">
@@ -807,7 +881,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
             size="sm"
             disabled={isSubmitting}
             onClick={() => handleSubmit('published')}
-            className="bg-[#D71932] hover:bg-[#b01328] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]"
+            className="bg-[#D71932] hover:bg-[#b01328] text-white shadow-[0_0_15px_rgba(215,25,50,0.35)]"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
@@ -850,7 +924,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
                 <span>Deleting Assets...</span>
               </>
             ) : (
-              <span>Confirm & Delete</span>
+              <span>Confirm &amp; Delete</span>
             )}
           </Button>
         </div>

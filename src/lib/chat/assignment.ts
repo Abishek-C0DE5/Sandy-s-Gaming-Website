@@ -1,4 +1,4 @@
-﻿import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -23,35 +23,37 @@ export async function ensureConversationAssigned(conversationId: string): Promis
   }
 
   try {
+    // 1. Fast check: is this conversation already assigned to staff?
+    const { data: existing } = await client
+      .from('conversation_assignments')
+      .select('admin_id')
+      .eq('conversation_id', conversationId)
+      .eq('status', 'active')
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      // Already assigned; 0ms overhead
+      return true;
+    }
+
+    // 2. Not assigned yet: fetch active staff and batch insert
     const { data: admins, error: adminsError } = await client
       .from('profiles')
-      .select('id, email, role')
+      .select('id')
       .in('role', ['admin', 'super_admin'])
       .eq('account_status', 'active');
 
     if (adminsError || !admins || admins.length === 0) {
-      console.warn('[Assignment] No active admins found in profiles');
       return false;
     }
 
-    for (const admin of admins) {
-      const { data: existing } = await client
-        .from('conversation_assignments')
-        .select('id')
-        .eq('conversation_id', conversationId)
-        .eq('admin_id', admin.id)
-        .eq('status', 'active')
-        .maybeSingle();
+    const assignmentsToInsert = admins.map((admin) => ({
+      conversation_id: conversationId,
+      admin_id: admin.id,
+      status: 'active' as const,
+    }));
 
-      if (!existing) {
-        await client.from('conversation_assignments').insert({
-          conversation_id: conversationId,
-          admin_id: admin.id,
-          status: 'active',
-        });
-      }
-    }
-
+    await client.from('conversation_assignments').insert(assignmentsToInsert);
     return true;
   } catch (err) {
     console.error('[Assignment] Error ensuring conversation assignment:', err);

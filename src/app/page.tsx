@@ -12,7 +12,7 @@ import {
   Sparkles,
   Flame,
   Swords,
-  Trophy,
+  Palette,
   Users,
 } from 'lucide-react';
 
@@ -67,7 +67,7 @@ export default async function HomePage() {
           <div className="gaming-card rounded-2xl p-6 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-28 h-28 bg-[#D71932]/10 rounded-full blur-2xl group-hover:bg-[#D71932]/25 transition-all" />
             <div className="h-12 w-12 rounded-xl bg-[#171719] border border-white/[0.08] flex items-center justify-center text-[#D71932] mb-4">
-              <Trophy className="h-6 w-6" />
+              <Swords className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-[#F7F7F8] tracking-tight">Competitive Coverage</h3>
             <p className="mt-2 text-sm text-[#A5A5AD] leading-relaxed">
@@ -78,7 +78,7 @@ export default async function HomePage() {
           <div className="gaming-card rounded-2xl p-6 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-28 h-28 bg-[#D71932]/10 rounded-full blur-2xl group-hover:bg-[#D71932]/25 transition-all" />
             <div className="h-12 w-12 rounded-xl bg-[#171719] border border-white/[0.08] flex items-center justify-center text-[#D71932] mb-4">
-              <Sparkles className="h-6 w-6" />
+              <Palette className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-[#F7F7F8] tracking-tight">Exclusive Art &amp; Media</h3>
             <p className="mt-2 text-sm text-[#A5A5AD] leading-relaxed">

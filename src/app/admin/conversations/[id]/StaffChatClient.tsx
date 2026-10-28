@@ -697,7 +697,7 @@ export function StaffChatClient({
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Write a specialist response to customer..."
                     maxLength={5000}
-                    disabled={isSending || isAccessRevoked}
+                    disabled={isAccessRevoked}
                     className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 disabled:opacity-50"
                   />
                   {inputText.length > 3000 && (
@@ -709,14 +709,10 @@ export function StaffChatClient({
 
                 <button
                   type="submit"
-                  disabled={isSending || !inputText.trim() || isAccessRevoked}
+                  disabled={!inputText.trim() || isAccessRevoked}
                   className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors shrink-0"
                 >
-                  {isSending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
+                  <Send className="h-4 w-4" />
                   <span>Send Reply</span>
                 </button>
               </form>

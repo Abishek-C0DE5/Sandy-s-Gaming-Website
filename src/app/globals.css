@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
 :root {
+  --background: #F8F9FA;
+  --foreground: #111113;
+  --surface-secondary: #FFFFFF;
+  --surface-elevated: #F1F2F4;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --brand-red: #D71932;
+  --brand-red-dark: #A31224;
+  --brand-red-glow: rgba(215, 25, 50, 0.25);
+  --text-primary: #111113;
+  --text-muted: #6B7280;
+}
+
+html.dark {
   --background: #080809;
   --foreground: #F7F7F8;
   --surface-secondary: #101012;
@@ -13,25 +26,23 @@
   --text-muted: #A5A5AD;
 }
 
-@theme inline {
-  --color-brand-bg: #080809;
-  --color-brand-surface: #101012;
-  --color-brand-elevated: #171719;
-  --color-brand-border: rgba(255, 255, 255, 0.08);
-  --color-brand-red: #D71932;
-  --color-brand-red-dark: #780D1D;
-  --color-brand-red-glow: rgba(215, 25, 50, 0.35);
-  --color-brand-text: #F7F7F8;
-  --color-brand-muted: #A5A5AD;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 body {
-  background: #080809;
-  color: #F7F7F8;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html:not(.dark) .gaming-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
+}
+
+html:not(.dark) .gaming-card:hover {
+  border-color: rgba(215, 25, 50, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(215, 25, 50, 0.2);
 }
 
 /* Custom Scrollbar for gaming aesthetic */

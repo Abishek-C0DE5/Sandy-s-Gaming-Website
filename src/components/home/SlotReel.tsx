@@ -1,21 +1,22 @@
 'use client';
 
 import { useMemo } from 'react';
+import { Swords, Shield, Crosshair, Flame, Award } from 'lucide-react';
 
 export interface SlotSymbol {
   id: string;
-  label: string;
   name: string;
+  icon: React.ComponentType<{ className?: string }>;
   isSeven?: boolean;
 }
 
 export const GAMING_SYMBOLS: SlotSymbol[] = [
-  { id: 'katana', label: '⚔️', name: 'Katana' },
-  { id: 'dragon', label: '🐲', name: 'Dragon' },
-  { id: 'seven', label: '7', name: 'Lucky Seven', isSeven: true },
-  { id: 'skull', label: '💀', name: 'Reaper' },
-  { id: 'flame', label: '🔥', name: 'Crimson Flame' },
-  { id: 'crown', label: '👑', name: 'Esports Crown' },
+  { id: 'katana', name: 'Katana', icon: Swords },
+  { id: 'dragon', name: 'Aegis Shield', icon: Shield },
+  { id: 'seven', name: 'Lucky Seven', icon: Swords, isSeven: true },
+  { id: 'skull', name: 'Crosshair', icon: Crosshair },
+  { id: 'flame', name: 'Crimson Flame', icon: Flame },
+  { id: 'crown', name: 'Champion Crown', icon: Award },
 ];
 
 interface SlotReelProps {
@@ -102,9 +103,9 @@ export function SlotReel({
                   </span>
                 </div>
               ) : (
-                <span className="text-4xl sm:text-5xl filter grayscale contrast-125 opacity-70">
-                  {sym.label}
-                </span>
+                <div className="flex items-center justify-center text-white/50">
+                  <sym.icon className="h-9 w-9 sm:h-11 sm:w-11" />
+                </div>
               )}
             </div>
           );

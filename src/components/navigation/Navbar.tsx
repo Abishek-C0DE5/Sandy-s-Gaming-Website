@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { UserRole } from '@/types/database';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { MessageSquare, BookOpen, Image as ImageIcon, Mail, Shield, Menu, X, LogOut, User, LogIn } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -78,7 +79,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#080809]/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-black/[0.08] dark:border-white/[0.08] bg-white/95 dark:bg-[#080809]/95 backdrop-blur-xl transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Official Brand Logo */}
         <div className="flex items-center gap-3">
@@ -86,10 +87,10 @@ export function Navbar() {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-[#A5A5AD]">
+        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-neutral-600 dark:text-[#A5A5AD]">
           <Link
             href="/blog"
-            className="flex items-center gap-1.5 hover:text-white hover:text-[#D71932] transition-colors"
+            className="flex items-center gap-1.5 hover:text-neutral-900 dark:hover:text-white hover:text-[#D71932] dark:hover:text-[#D71932] transition-colors"
           >
             <BookOpen className="h-4 w-4 text-[#D71932]" />
             <span>Blogs</span>
@@ -176,14 +177,18 @@ export function Navbar() {
               </Link>
             </div>
           )}
+
+          {/* Theme Toggle (Light / Dark) */}
+          <ThemeToggle />
         </div>
 
-        {/* Mobile menu button */}
-        <div className="flex md:hidden">
+        {/* Mobile controls */}
+        <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex items-center justify-center rounded-lg p-2 text-[#A5A5AD] hover:text-white hover:bg-[#171719]"
+            className="inline-flex items-center justify-center rounded-lg p-2 text-neutral-600 dark:text-[#A5A5AD] hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-[#171719]"
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle navigation menu"
           >

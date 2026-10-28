@@ -8,6 +8,8 @@ import {
   AlertCircle,
   RotateCcw,
   CheckCircle2,
+  Check,
+  CheckCheck,
   Clock,
   ShieldCheck,
   XCircle,
@@ -566,13 +568,13 @@ export function CustomerChatClient({
                   {msg.body}
                 </div>
 
-                {/* Status indicator for outgoing messages */}
+                {/* Status indicator for outgoing messages (Messenger-style) */}
                 {isSelf && (
                   <div className="mt-1 flex items-center gap-1 px-1 text-[10px] text-neutral-400">
                     {msg.status === 'pending' && (
-                      <span className="inline-flex items-center gap-1 text-neutral-500">
-                        <Clock className="h-3 w-3 animate-spin" />
-                        <span>Sending...</span>
+                      <span className="inline-flex items-center gap-1 text-neutral-400 dark:text-neutral-500" title="Sending...">
+                        <Check className="h-3 w-3 text-neutral-400" />
+                        <span>Sending</span>
                       </span>
                     )}
 
@@ -592,9 +594,9 @@ export function CustomerChatClient({
                     )}
 
                     {(!msg.status || msg.status === 'sent') && (
-                      <span className="inline-flex items-center gap-1 text-neutral-400 dark:text-neutral-500">
-                        <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                        <span>Sent</span>
+                      <span className="inline-flex items-center gap-1 text-neutral-400 dark:text-neutral-500" title="Delivered">
+                        <CheckCheck className="h-3 w-3 text-blue-500 dark:text-blue-400" />
+                        <span>Delivered</span>
                       </span>
                     )}
                   </div>
@@ -619,7 +621,7 @@ export function CustomerChatClient({
           </div>
         )}
 
-        {/* Message Input Bar */}
+        {/* Message Input Bar (Never blocks user input - Instant Messenger feel) */}
         <div className="border-t border-neutral-200 p-4 bg-white dark:border-neutral-800 dark:bg-neutral-900">
           <form
             onSubmit={(e) => {
@@ -635,7 +637,7 @@ export function CustomerChatClient({
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Type your message to Support Team..."
                 maxLength={5000}
-                disabled={isSending || !conversation}
+                disabled={!conversation}
                 className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 disabled:opacity-50"
               />
               {inputText.length > 3000 && (
@@ -647,14 +649,10 @@ export function CustomerChatClient({
 
             <button
               type="submit"
-              disabled={isSending || !inputText.trim() || !conversation}
+              disabled={!inputText.trim() || !conversation}
               className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors shrink-0"
             >
-              {isSending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
+              <Send className="h-4 w-4" />
               <span>Send</span>
             </button>
           </form>

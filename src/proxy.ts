@@ -31,19 +31,31 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // Refresh auth token
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const pathname = request.nextUrl.pathname;
 
   // Protected route checking:
   const isCustomerRoute = pathname.startsWith('/chat') || pathname.startsWith('/account');
   const isAdminRoute = pathname.startsWith('/admin');
   const isSuperAdminRoute = pathname.startsWith('/super-admin');
+  const isProtectedRoute = isCustomerRoute || isAdminRoute || isSuperAdminRoute;
 
-  if (isCustomerRoute || isAdminRoute || isSuperAdminRoute) {
+  // Check if cookies contain Supabase session tokens
+  const allCookies = request.cookies.getAll();
+  const hasAuthCookie = allCookies.some(
+    (c) => c.name.includes('auth-token') || c.name.startsWith('sb-')
+  );
+
+  // If public route and no session cookies, immediately return response (0ms latency!)
+  if (!isProtectedRoute && !hasAuthCookie) {
+    return supabaseResponse;
+  }
+
+  // Refresh auth token
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (isProtectedRoute) {
     if (!user) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
