@@ -1,0 +1,213 @@
+import { requireRole } from '@/lib/auth';
+import { createAdminClient } from '@/lib/supabase/server';
+import { Mail, Clock, User, Phone, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
+import Link from 'next/link';
+import { InquiryStatus } from '@/types/database';
+
+interface AdminContactRequestsPageProps {
+  searchParams: Promise<{ status?: string }>;
+}
+
+export default async function AdminContactRequestsPage({
+  searchParams,
+}: AdminContactRequestsPageProps) {
+  await requireRole(['admin', 'super_admin'], '/admin/contact-requests');
+  const { status: statusFilter } = await searchParams;
+
+  const adminClient = await createAdminClient();
+
+  let query = adminClient
+    .from('contact_inquiries')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (
+    statusFilter &&
+    (['new', 'in_progress', 'replied', 'closed'] as const).includes(statusFilter as InquiryStatus)
+  ) {
+    query = query.eq('status', statusFilter as InquiryStatus);
+  }
+
+  const { data: inquiries } = await query;
+
+  // Counts for tabs
+  const { data: allCounts } = await adminClient
+    .from('contact_inquiries')
+    .select('status');
+
+  const counts = {
+    all: allCounts?.length || 0,
+    new: allCounts?.filter((i) => i.status === 'new').length || 0,
+    in_progress: allCounts?.filter((i) => i.status === 'in_progress').length || 0,
+    replied: allCounts?.filter((i) => i.status === 'replied').length || 0,
+    closed: allCounts?.filter((i) => i.status === 'closed').length || 0,
+  };
+
+  // Fetch staff profiles for assigned names lookup
+  const { data: staffProfiles } = await adminClient
+    .from('profiles')
+    .select('id, display_name, email');
+
+  const staffMap = new Map(staffProfiles?.map((p) => [p.id, p]) || []);
+
+  const hasInquiries = inquiries && inquiries.length > 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            Guest Contact Requests
+          </h2>
+          <p className="mt-1 text-xs text-neutral-500">
+            Inquiries submitted via the public Contact Us form. Triage status, manage staff assignments, and record responses.
+          </p>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-1 border-b border-neutral-200 dark:border-neutral-800 pb-2 overflow-x-auto text-xs font-medium">
+        {[
+          { key: undefined, label: 'All Requests', count: counts.all },
+          { key: 'new', label: 'New', count: counts.new },
+          { key: 'in_progress', label: 'In Progress', count: counts.in_progress },
+          { key: 'replied', label: 'Replied', count: counts.replied },
+          { key: 'closed', label: 'Closed', count: counts.closed },
+        ].map((tab) => {
+          const isActive = (!statusFilter && !tab.key) || statusFilter === tab.key;
+          const href = tab.key ? `/admin/contact-requests?status=${tab.key}` : '/admin/contact-requests';
+
+          return (
+            <Link
+              key={tab.label}
+              href={href}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700 font-semibold dark:bg-blue-950/40 dark:text-blue-300'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-800'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span
+                className={`rounded-full px-1.5 py-0.2 text-[10px] font-semibold ${
+                  isActive
+                    ? 'bg-blue-200/70 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                    : 'bg-neutral-200/70 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                }`}
+              >
+                {tab.count}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+
+      {!hasInquiries ? (
+        <EmptyState
+          icon={Mail}
+          title={statusFilter ? `No ${statusFilter.replace('_', ' ')} inquiries` : 'No contact inquiries found'}
+          description="Submissions from the public Contact Us form will appear here for staff triage and email response."
+        />
+      ) : (
+        <div className="rounded-2xl border border-neutral-200 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden">
+          <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800 text-left text-xs">
+            <thead className="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500">
+              <tr>
+                <th className="px-6 py-3 font-semibold">Sender Details</th>
+                <th className="px-6 py-3 font-semibold">Message Synopsis</th>
+                <th className="px-6 py-3 font-semibold">Status</th>
+                <th className="px-6 py-3 font-semibold">Assigned Staff</th>
+                <th className="px-6 py-3 font-semibold">Date</th>
+                <th className="px-6 py-3 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+              {inquiries.map((inq) => {
+                const assigned = inq.assigned_admin_id ? staffMap.get(inq.assigned_admin_id) : null;
+
+                return (
+                  <tr key={inq.id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/50 transition-colors">
+                    {/* Sender Details */}
+                    <td className="px-6 py-3.5 font-medium text-neutral-900 dark:text-white">
+                      <div>
+                        <div className="font-semibold text-xs">
+                          {inq.name || 'Anonymous Guest'}
+                        </div>
+                        <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
+                          {inq.email}
+                        </div>
+                        <div className="text-[11px] text-neutral-400 flex items-center gap-1 mt-0.5">
+                          <Phone className="h-3 w-3" />
+                          <span>{inq.phone}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Message Preview */}
+                    <td className="px-6 py-3.5 text-neutral-600 dark:text-neutral-400 max-w-sm">
+                      <p className="line-clamp-2 text-xs leading-relaxed">
+                        {inq.message}
+                      </p>
+                    </td>
+
+                    {/* Status Badge */}
+                    <td className="px-6 py-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${
+                          inq.status === 'new'
+                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/50'
+                            : inq.status === 'in_progress'
+                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-400 border border-purple-200/50 dark:border-purple-800/50'
+                            : inq.status === 'replied'
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50'
+                            : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                        }`}
+                      >
+                        {inq.status === 'new' && <AlertCircle className="h-3 w-3" />}
+                        {inq.status === 'replied' && <CheckCircle2 className="h-3 w-3" />}
+                        <span>{inq.status.replace('_', ' ')}</span>
+                      </span>
+                    </td>
+
+                    {/* Assigned Staff */}
+                    <td className="px-6 py-3.5 text-neutral-500">
+                      {assigned?.display_name ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-neutral-700 dark:text-neutral-300 font-medium">
+                          <User className="h-3 w-3 text-neutral-400" />
+                          <span>{assigned.display_name}</span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-neutral-400 italic">Unassigned</span>
+                      )}
+                    </td>
+
+                    {/* Date */}
+                    <td className="px-6 py-3.5 text-neutral-500 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-[11px]">
+                        <Clock className="h-3 w-3 text-neutral-400" />
+                        <span>{new Date(inq.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </td>
+
+                    {/* Action */}
+                    <td className="px-6 py-3.5 text-right whitespace-nowrap">
+                      <Link
+                        href={`/admin/contact-requests/${inq.id}`}
+                        className="inline-flex items-center gap-1 rounded-lg bg-neutral-900 px-2.5 py-1 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 transition-colors"
+                      >
+                        <span>View</span>
+                        <ArrowRight className="h-3 w-3" />
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
