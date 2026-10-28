@@ -1,11 +1,18 @@
 ﻿import { requireAuth, getCurrentProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import { CustomerChatClient } from './CustomerChatClient';
 import { ensureConversationAssigned } from '@/lib/chat/assignment';
 
 export default async function CustomerChatPage() {
   const user = await requireAuth('/login?redirect=/chat');
   const profile = await getCurrentProfile();
+
+  // If user is staff (admin or super_admin), route them directly to the Admin Inbox
+  if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+    redirect('/admin/conversations');
+  }
+
   const supabase = await createClient();
 
   // 1. Retrieve or automatically provision active conversation

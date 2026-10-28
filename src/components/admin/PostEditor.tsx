@@ -87,6 +87,8 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
 
   // Handle title change with optional auto-slug
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +120,8 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('isDraft', status === 'draft' ? 'true' : 'false');
+      // Ensure media is stored permanently in public storage for post rendering
+      formData.append('isDraft', 'false');
       formData.append('folder', 'covers');
 
       const res = await fetch('/api/admin/media/upload', {
@@ -161,7 +164,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('isDraft', status === 'draft' ? 'true' : 'false');
+        formData.append('isDraft', 'false');
         formData.append('folder', 'gallery');
 
         const res = await fetch('/api/admin/media/upload', {
@@ -351,7 +354,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
             size="sm"
             disabled={isSubmitting}
             onClick={() => handleSubmit('published')}
-            className="bg-blue-600 hover:bg-blue-500"
+            className="bg-[#D71932] hover:bg-[#b01328] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
@@ -577,7 +580,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
           <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                Cover Media
+                Cover Image
               </h3>
               <span className="text-[11px] text-neutral-400">Max 5MB (JPG, PNG, WebP)</span>
             </div>
@@ -599,37 +602,97 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     <span>Asset Connected</span>
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => setCoverImage(null)}
-                    className="text-red-500 hover:text-red-600 text-xs font-medium"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('cover-file-input')?.click()}
+                      className="text-blue-500 hover:text-blue-600 text-xs font-medium cursor-pointer"
+                    >
+                      Replace
+                    </button>
+                    <span className="text-neutral-300">&bull;</span>
+                    <button
+                      type="button"
+                      onClick={() => setCoverImage(null)}
+                      className="text-red-500 hover:text-red-600 text-xs font-medium cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="relative border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-600 transition-colors">
-                <input
-                  id="cover-file-input"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif"
-                  onChange={handleCoverUpload}
-                  disabled={uploadingCover}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                />
-                <div className="flex flex-col items-center">
-                  {uploadingCover ? (
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <div className="space-y-3">
+                <div className="rounded-xl border-2 border-dashed border-neutral-300 p-5 text-center hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-600 transition-colors bg-neutral-50/50 dark:bg-neutral-800/30">
+                  <input
+                    id="cover-file-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    onChange={handleCoverUpload}
+                    disabled={uploadingCover}
+                    className="hidden"
+                  />
+                  <div className="flex flex-col items-center">
+                    {uploadingCover ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-[#D71932]" />
+                    ) : (
+                      <Upload className="h-8 w-8 text-neutral-400" />
+                    )}
+                    <span className="mt-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      {uploadingCover ? 'Uploading file to storage...' : 'Cover Image Asset'}
+                    </span>
+                    <p className="mt-0.5 text-[11px] text-neutral-400">
+                      PNG, JPG, WebP up to 5MB
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('cover-file-input')?.click()}
+                      disabled={uploadingCover}
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#D71932] px-4 py-2 text-xs font-bold text-white shadow-[0_0_12px_rgba(215,25,50,0.3)] hover:bg-[#b01328] transition-colors cursor-pointer"
+                    >
+                      <Upload className="h-3.5 w-3.5" />
+                      <span>{uploadingCover ? 'Uploading...' : 'Choose Image File'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Direct image link option */}
+                <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                  {!showUrlInput ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowUrlInput(true)}
+                      className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                    >
+                      Or paste an image URL instead
+                    </button>
                   ) : (
-                    <Upload className="h-8 w-8 text-neutral-400" />
+                    <div className="space-y-2">
+                      <label className="block text-[11px] font-medium text-neutral-500">Image Web Link</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          placeholder="https://example.com/cover.jpg"
+                          value={imageUrlInput}
+                          onChange={(e) => setImageUrlInput(e.target.value)}
+                          className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2.5 py-1.5 text-xs text-neutral-900 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (imageUrlInput.trim()) {
+                              setCoverImage(imageUrlInput.trim());
+                              setImageUrlInput('');
+                              setShowUrlInput(false);
+                            }
+                          }}
+                          className="rounded-lg bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 text-white px-3 py-1.5 text-xs font-semibold shrink-0 cursor-pointer"
+                        >
+                          Attach
+                        </button>
+                      </div>
+                    </div>
                   )}
-                  <span className="mt-2 text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                    {uploadingCover ? 'Uploading file to storage...' : 'Click or drag image to upload'}
-                  </span>
-                  <span className="mt-1 text-[10px] text-neutral-400">
-                    Routing to {status === 'draft' ? 'draft-media (private)' : 'public-media (public)'}
-                  </span>
                 </div>
               </div>
             )}
@@ -669,7 +732,7 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
                       <button
                         type="button"
                         onClick={() => removeGalleryItem(idx)}
-                        className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
@@ -678,26 +741,81 @@ export function PostEditor({ initialData, isEditMode = false }: PostEditorProps)
                 </div>
               )}
 
-              <div className="relative border-2 border-dashed border-neutral-300 rounded-xl p-4 text-center hover:border-neutral-400 dark:border-neutral-700 transition-colors">
+              <div className="rounded-xl border-2 border-dashed border-neutral-300 p-4 text-center hover:border-neutral-400 dark:border-neutral-700 transition-colors bg-neutral-50/50 dark:bg-neutral-800/30">
                 <input
+                  id="gallery-file-input"
                   type="file"
                   multiple
                   accept="image/jpeg,image/png,image/webp,image/avif"
                   onChange={handleGalleryUpload}
                   disabled={uploadingGallery}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  className="hidden"
                 />
-                <div className="flex items-center justify-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                  {uploadingGallery ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                  ) : (
-                    <ImageIcon className="h-4 w-4 text-neutral-400" />
-                  )}
-                  <span>{uploadingGallery ? 'Uploading gallery...' : 'Add Gallery Images'}</span>
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+                    {uploadingGallery ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-[#D71932]" />
+                    ) : (
+                      <ImageIcon className="h-4 w-4 text-neutral-400" />
+                    )}
+                    <span>{uploadingGallery ? 'Uploading gallery...' : 'Select images for poster showcase'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('gallery-file-input')?.click()}
+                    disabled={uploadingGallery}
+                    className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-neutral-800 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-neutral-700 transition-colors cursor-pointer"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Browse Gallery Images</span>
+                  </button>
                 </div>
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Bottom Sticky Action Bar */}
+      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm">
+        <Link
+          href="/admin/posts"
+          className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 font-medium"
+        >
+          &larr; Cancel & Return to Posts
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={isSubmitting}
+            onClick={() => handleSubmit('draft')}
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+            ) : (
+              <FileText className="h-4 w-4 mr-1.5" />
+            )}
+            <span>Save as Draft</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            disabled={isSubmitting}
+            onClick={() => handleSubmit('published')}
+            className="bg-[#D71932] hover:bg-[#b01328] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]"
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4 mr-1.5" />
+            )}
+            <span>Publish Post Now</span>
+          </Button>
         </div>
       </div>
 

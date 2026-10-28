@@ -30,6 +30,20 @@ export default async function AdminLayout({
         <div className="flex items-center gap-3">
           <nav className="flex items-center gap-2 text-xs font-medium">
             <Link
+              href="/admin/posts/new"
+              className="flex items-center gap-1.5 rounded-lg bg-[#D71932] px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_12px_rgba(215,25,50,0.35)] hover:bg-[#b01328] transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              <span>+ New Post</span>
+            </Link>
+            <Link
+              href="/admin/posts"
+              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              <span>All Posts</span>
+            </Link>
+            <Link
               href="/admin/conversations"
               className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
             >
@@ -42,13 +56,6 @@ export default async function AdminLayout({
             >
               <Mail className="h-3.5 w-3.5" />
               <span>Contact Requests</span>
-            </Link>
-            <Link
-              href="/admin/posts"
-              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              <span>Posts</span>
             </Link>
             {profile.role === 'super_admin' && (
               <Link

@@ -30,10 +30,10 @@ export default async function AdminPostsPage() {
 
         <Link
           href="/admin/posts/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition-colors shadow-xs"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#D71932] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#b01328] transition-all shadow-[0_0_15px_rgba(215,25,50,0.35)] transform hover:-translate-y-0.5"
         >
           <Plus className="h-4 w-4" />
-          <span>Create New Post</span>
+          <span>+ Create New Post</span>
         </Link>
       </div>
 
@@ -45,10 +45,10 @@ export default async function AdminPostsPage() {
           action={
             <Link
               href="/admin/posts/new"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#D71932] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#b01328] shadow-[0_0_15px_rgba(215,25,50,0.35)]"
             >
               <Plus className="h-4 w-4" />
-              <span>Create First Post</span>
+              <span>+ Create First Post</span>
             </Link>
           }
         />

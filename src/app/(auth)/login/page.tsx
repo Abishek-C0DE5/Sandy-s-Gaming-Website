@@ -82,21 +82,18 @@ function LoginContent() {
 
       if (profile && profile.account_status === 'suspended') {
         await supabase.auth.signOut();
-        router.push('/suspended');
+        window.location.href = '/suspended';
         return;
       }
 
-      setTimeout(() => {
-        if (redirectTarget) {
-          router.push(redirectTarget);
-        } else if (profile?.role === 'super_admin') {
-          router.push('/super-admin');
-        } else if (profile?.role === 'admin') {
-          router.push('/admin');
-        } else {
-          router.push('/chat');
-        }
-      }, 500);
+      const dest = redirectTarget || (
+        profile?.role === 'super_admin'
+          ? '/super-admin'
+          : profile?.role === 'admin'
+          ? '/admin/conversations'
+          : '/chat'
+      );
+      window.location.href = dest;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to sign in. Please try again.';
       setErrorMsg(message);

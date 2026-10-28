@@ -109,11 +109,11 @@ export function Navbar() {
             <span>Contact Us</span>
           </Link>
           <Link
-            href="/chat"
+            href={userRole === 'admin' || userRole === 'super_admin' ? '/admin/conversations' : '/chat'}
             className="flex items-center gap-1.5 hover:text-white hover:text-[#D71932] transition-colors"
           >
             <MessageSquare className="h-4 w-4 text-[#D71932]" />
-            <span>Live Chat</span>
+            <span>{userRole === 'admin' || userRole === 'super_admin' ? 'Admin Inbox' : 'Live Chat'}</span>
           </Link>
         </nav>
 
@@ -122,13 +122,21 @@ export function Navbar() {
           {!loading && userEmail ? (
             <div className="flex items-center gap-3">
               {(userRole === 'admin' || userRole === 'super_admin') && (
-                <Link
-                  href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#D71932] px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_15px_rgba(215,25,50,0.4)] hover:bg-[#b01328] transition-colors"
-                >
-                  <Shield className="h-3.5 w-3.5" />
-                  <span>{userRole === 'super_admin' ? 'Super Admin' : 'Admin'}</span>
-                </Link>
+                <>
+                  <Link
+                    href="/admin/posts/new"
+                    className="flex items-center gap-1.5 rounded-lg border border-[#D71932]/50 bg-[#171719] px-3 py-1.5 text-xs font-bold text-[#F7F7F8] hover:border-[#D71932] hover:bg-[#D71932]/10 transition-colors"
+                  >
+                    <span>+ Post</span>
+                  </Link>
+                  <Link
+                    href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
+                    className="flex items-center gap-1.5 rounded-lg bg-[#D71932] px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_15px_rgba(215,25,50,0.4)] hover:bg-[#b01328] transition-colors"
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    <span>{userRole === 'super_admin' ? 'Super Admin' : 'Admin'}</span>
+                  </Link>
+                </>
               )}
               <div className="flex items-center gap-1.5 text-xs text-[#A5A5AD] bg-[#101012] border border-white/[0.08] rounded-lg px-2.5 py-1.5">
                 <User className="h-3.5 w-3.5 text-[#D71932]" />
@@ -227,13 +235,22 @@ export function Navbar() {
                     Signed in: {userEmail} ({userRole})
                   </div>
                   {(userRole === 'admin' || userRole === 'super_admin') && (
-                    <Link
-                      href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full text-center rounded-lg bg-[#D71932] py-2 text-sm font-bold text-white shadow-xs"
-                    >
-                      Staff Dashboard
-                    </Link>
+                    <>
+                      <Link
+                        href="/admin/posts/new"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full text-center rounded-lg border border-[#D71932]/50 bg-[#171719] py-2 text-sm font-bold text-[#F7F7F8] hover:border-[#D71932]"
+                      >
+                        + Create New Post
+                      </Link>
+                      <Link
+                        href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full text-center rounded-lg bg-[#D71932] py-2 text-sm font-bold text-white shadow-xs"
+                      >
+                        Staff Dashboard
+                      </Link>
+                    </>
                   )}
                   <button
                     type="button"
