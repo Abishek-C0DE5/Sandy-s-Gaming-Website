@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
 import { CinematicHeroContainer } from '@/components/home/CinematicHeroContainer';
+import { SocialFeed } from '@/components/home/SocialFeed';
 import {
   BookOpen,
   MessageSquare,
@@ -19,6 +20,15 @@ import {
 export default async function HomePage() {
   await connection();
   const supabase = await createClient();
+
+  // Query recent feed posts (both articles and posters for the social feed)
+  const { data: feedPosts } = await supabase
+    .from('posts')
+    .select('id, title, slug, excerpt, body, cover_image, post_type, published_at, created_at')
+    .eq('status', 'published')
+    .lte('published_at', new Date().toISOString())
+    .order('published_at', { ascending: false })
+    .limit(8);
 
   // Query recent published blog articles (limit 3)
   const { data: recentBlogs } = await supabase
@@ -48,55 +58,9 @@ export default async function HomePage() {
       {/* 1. Cinematic Slot-Reveal Hero Container */}
       <CinematicHeroContainer />
 
-      {/* 2. Brand Value & Arena Features */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#171719] border border-[#D71932]/30 text-xs font-bold text-[#D71932] uppercase tracking-wider">
-            <Swords className="h-3.5 w-3.5" />
-            <span>The Sandy&apos;s Advantage</span>
-          </div>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#F7F7F8]">
-            Engineered For <span className="text-[#D71932]">Competitors</span>
-          </h2>
-          <p className="mt-2 text-sm text-[#A5A5AD]">
-            Everything a competitive gamer and fan needs — from tournament reports and tactical guides to direct support.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="gaming-card rounded-2xl p-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-28 h-28 bg-[#D71932]/10 rounded-full blur-2xl group-hover:bg-[#D71932]/25 transition-all" />
-            <div className="h-12 w-12 rounded-xl bg-[#171719] border border-white/[0.08] flex items-center justify-center text-[#D71932] mb-4">
-              <Swords className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-[#F7F7F8] tracking-tight">Competitive Coverage</h3>
-            <p className="mt-2 text-sm text-[#A5A5AD] leading-relaxed">
-              In-depth tournament analysis, player rosters, meta tier lists, and tactical breakdowns curated by seasoned competitors.
-            </p>
-          </div>
-
-          <div className="gaming-card rounded-2xl p-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-28 h-28 bg-[#D71932]/10 rounded-full blur-2xl group-hover:bg-[#D71932]/25 transition-all" />
-            <div className="h-12 w-12 rounded-xl bg-[#171719] border border-white/[0.08] flex items-center justify-center text-[#D71932] mb-4">
-              <Palette className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-[#F7F7F8] tracking-tight">Exclusive Art &amp; Media</h3>
-            <p className="mt-2 text-sm text-[#A5A5AD] leading-relaxed">
-              Official high-resolution anime and warrior-themed posters, desktop wallpapers, and custom esports artwork.
-            </p>
-          </div>
-
-          <div className="gaming-card rounded-2xl p-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-28 h-28 bg-[#D71932]/10 rounded-full blur-2xl group-hover:bg-[#D71932]/25 transition-all" />
-            <div className="h-12 w-12 rounded-xl bg-[#171719] border border-white/[0.08] flex items-center justify-center text-[#D71932] mb-4">
-              <MessageSquare className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-bold text-[#F7F7F8] tracking-tight">Real-Time Staff Support</h3>
-            <p className="mt-2 text-sm text-[#A5A5AD] leading-relaxed">
-              Authenticated live customer chat with our multi-admin Support Team. Instant answers, ticket tracking, and direct inquiry follow-up.
-            </p>
-          </div>
-        </div>
+      {/* 2. Facebook-Style Community & Esports Social Feed */}
+      <section className="relative">
+        <SocialFeed initialPosts={feedPosts || []} />
       </section>
 
       {/* 3. Featured Esports Articles Section (Real Data from Supabase) */}

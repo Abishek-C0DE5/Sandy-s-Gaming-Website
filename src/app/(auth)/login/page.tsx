@@ -178,31 +178,31 @@ function LoginContent() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-neutral-200 bg-white p-8 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-white/[0.08] bg-[#101012] p-8 shadow-2xl">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#D71932] text-white shadow-[0_0_20px_rgba(215,25,50,0.4)]">
             <Shield className="h-6 w-6" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="mt-4 text-2xl font-black uppercase tracking-wider text-white">
             Sign In to Sandy&apos;s Gaming
           </h1>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="mt-2 text-sm text-[#A5A5AD]">
             Select your preferred sign in method.
           </p>
         </div>
 
         {/* Primary Auth Mode Switcher (Password vs OTP) */}
-        <div className="grid grid-cols-2 gap-2 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800">
+        <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#171719] p-1 border border-white/[0.06]">
           <button
             type="button"
             onClick={() => {
               setAuthMode('password');
               setErrorMsg(null);
             }}
-            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition-all ${
               authMode === 'password'
-                ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
+                ? 'bg-[#D71932] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]'
+                : 'text-[#A5A5AD] hover:text-white'
             }`}
           >
             <Lock className="h-3.5 w-3.5" />
@@ -214,10 +214,10 @@ function LoginContent() {
               setAuthMode('otp');
               setErrorMsg(null);
             }}
-            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition-all ${
               authMode === 'otp'
-                ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
+                ? 'bg-[#D71932] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]'
+                : 'text-[#A5A5AD] hover:text-white'
             }`}
           >
             <KeyRound className="h-3.5 w-3.5" />
@@ -410,47 +410,47 @@ function LoginContent() {
         )}
 
         {/* Quick Test Accounts Autofill Helper */}
-        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-3 text-xs dark:border-blue-900/30 dark:bg-blue-950/20">
-          <div className="flex items-center gap-1.5 font-semibold text-blue-900 dark:text-blue-300">
-            <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Quick Test Personas (Click to autofill):</span>
+        <div className="rounded-xl border border-white/[0.08] bg-[#171719] p-3 text-xs">
+          <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#A5A5AD]">
+            <Sparkles className="h-3.5 w-3.5 text-[#D71932]" />
+            <span>Test Personas (Click to autofill):</span>
           </div>
-          <div className="mt-2 grid grid-cols-3 gap-1.5">
+          <div className="mt-2.5 grid grid-cols-3 gap-1.5">
             <button
               type="button"
               onClick={() => fillTestCredentials('visitor.sandysgaming@gmail.com', 'TestPassword123!')}
-              className="rounded-md border border-blue-200 bg-white px-2 py-1 text-center font-medium text-neutral-700 shadow-2xs hover:bg-blue-100 hover:text-blue-900 transition-colors dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              className="rounded-lg border border-white/[0.08] bg-[#101012] px-2 py-1.5 text-center font-bold text-xs text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
             >
               Visitor
             </button>
             <button
               type="button"
               onClick={() => fillTestCredentials('admin.sandysgaming@gmail.com', 'TestPassword123!')}
-              className="rounded-md border border-blue-200 bg-white px-2 py-1 text-center font-medium text-neutral-700 shadow-2xs hover:bg-blue-100 hover:text-blue-900 transition-colors dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              className="rounded-lg border border-white/[0.08] bg-[#101012] px-2 py-1.5 text-center font-bold text-xs text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
             >
               Admin
             </button>
             <button
               type="button"
               onClick={() => fillTestCredentials('superadmin.sandysgaming@gmail.com', 'TestPassword123!')}
-              className="rounded-md border border-blue-200 bg-white px-2 py-1 text-center font-medium text-neutral-700 shadow-2xs hover:bg-blue-100 hover:text-blue-900 transition-colors dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              className="rounded-lg border border-white/[0.08] bg-[#101012] px-2 py-1.5 text-center font-bold text-xs text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
             >
               Super Admin
             </button>
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-3 text-center text-xs dark:border-neutral-800 dark:bg-neutral-900/50">
-          <span className="text-neutral-600 dark:text-neutral-400">New to Sandy's Gaming? </span>
+        <div className="rounded-xl border border-white/[0.08] bg-[#171719]/50 p-3 text-center text-xs">
+          <span className="text-[#A5A5AD]">New to Sandy&apos;s Gaming? </span>
           <Link href="/register" className="font-bold text-[#D71932] hover:underline">
             Create an Account
           </Link>
         </div>
 
-        <div className="border-t border-neutral-200 pt-4 text-center text-xs text-neutral-500 dark:border-neutral-800">
+        <div className="border-t border-white/[0.08] pt-4 text-center text-xs text-[#A5A5AD]">
           <p>
             Are you a guest visitor? You don&apos;t need to log in to contact us.{' '}
-            <Link href="/contact" className="font-medium text-blue-600 hover:underline dark:text-blue-400">
+            <Link href="/contact" className="font-bold text-[#D71932] hover:underline">
               Submit a Guest Inquiry
             </Link>
           </p>

@@ -150,9 +150,9 @@ export function ContactFormClient() {
       <div>
         <label
           htmlFor="contact-name"
-          className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+          className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
         >
-          Your Name <span className="text-neutral-400 font-normal">(Optional)</span>
+          Your Name <span className="text-[#A5A5AD] font-normal normal-case">(Optional)</span>
         </label>
         <input
           id="contact-name"
@@ -161,7 +161,7 @@ export function ContactFormClient() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder="e.g. Alex Morgan"
           maxLength={100}
-          className="mt-1 w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+          className="mt-1.5 w-full rounded-lg border border-white/[0.1] bg-[#171719] px-3.5 py-2.5 text-xs text-white placeholder:text-[#64646D] focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] focus:outline-none transition-colors"
         />
       </div>
 
@@ -169,9 +169,9 @@ export function ContactFormClient() {
       <div>
         <label
           htmlFor="contact-email"
-          className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+          className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
         >
-          Email Address <span className="text-red-500">*</span>
+          Email Address <span className="text-[#D71932]">*</span>
         </label>
         <input
           id="contact-email"
@@ -187,14 +187,14 @@ export function ContactFormClient() {
           }}
           placeholder="e.g. alex@example.com"
           maxLength={254}
-          className={`mt-1 w-full rounded-lg border bg-white px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 dark:bg-neutral-800 dark:text-white ${
+          className={`mt-1.5 w-full rounded-lg border px-3.5 py-2.5 text-xs text-white placeholder:text-[#64646D] focus:outline-none focus:ring-1 bg-[#171719] transition-colors ${
             errors.email
               ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-neutral-300 focus:border-blue-500 focus:ring-blue-500 dark:border-neutral-700'
+              : 'border-white/[0.1] focus:border-[#D71932] focus:ring-[#D71932]'
           }`}
         />
         {errors.email && (
-          <p id="contact-email-error" className="mt-1 text-[11px] text-red-500 flex items-center gap-1">
+          <p id="contact-email-error" className="mt-1 text-[11px] text-red-400 flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             <span>{errors.email}</span>
           </p>
@@ -205,9 +205,9 @@ export function ContactFormClient() {
       <div>
         <label
           htmlFor="contact-phone"
-          className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+          className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
         >
-          Phone Number with Country Code <span className="text-red-500">*</span>
+          Phone Number with Country Code <span className="text-[#D71932]">*</span>
         </label>
         <input
           id="contact-phone"
@@ -223,17 +223,17 @@ export function ContactFormClient() {
           }}
           placeholder="+1 555-726-3974"
           maxLength={25}
-          className={`mt-1 w-full rounded-lg border bg-white px-3.5 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 dark:bg-neutral-800 dark:text-white ${
+          className={`mt-1.5 w-full rounded-lg border px-3.5 py-2.5 text-xs text-white placeholder:text-[#64646D] focus:outline-none focus:ring-1 bg-[#171719] transition-colors ${
             errors.phone
               ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-neutral-300 focus:border-blue-500 focus:ring-blue-500 dark:border-neutral-700'
+              : 'border-white/[0.1] focus:border-[#D71932] focus:ring-[#D71932]'
           }`}
         />
-        <p className="mt-0.5 text-[10px] text-neutral-400">
-          Must include international country code (e.g., +1 for US/CA, +44 for UK, +977 for NP).
+        <p className="mt-1 text-[11px] text-[#A5A5AD]">
+          Include your country code (e.g. +1 for US/CA, +44 for UK, +977 for Nepal).
         </p>
         {errors.phone && (
-          <p id="contact-phone-error" className="mt-1 text-[11px] text-red-500 flex items-center gap-1">
+          <p id="contact-phone-error" className="mt-1 text-[11px] text-red-400 flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             <span>{errors.phone}</span>
           </p>
@@ -245,12 +245,12 @@ export function ContactFormClient() {
         <div className="flex items-center justify-between">
           <label
             htmlFor="contact-message"
-            className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+            className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
           >
-            Message <span className="text-red-500">*</span>
+            Message <span className="text-[#D71932]">*</span>
           </label>
-          <span className="text-[10px] text-neutral-400">
-            {form.message.length} / 5000 characters
+          <span className="text-[11px] text-[#A5A5AD]">
+            {form.message.length} / 5000
           </span>
         </div>
         <textarea
@@ -265,16 +265,16 @@ export function ContactFormClient() {
             setForm({ ...form, message: e.target.value });
             if (errors.message) setErrors({ ...errors, message: '' });
           }}
-          placeholder="Please describe how we can assist you..."
+          placeholder="Please describe how our team can assist you..."
           maxLength={5000}
-          className={`mt-1 w-full rounded-lg border bg-white p-3 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 dark:bg-neutral-800 dark:text-white ${
+          className={`mt-1.5 w-full rounded-lg border p-3 text-xs text-white placeholder:text-[#64646D] focus:outline-none focus:ring-1 bg-[#171719] transition-colors ${
             errors.message
               ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-neutral-300 focus:border-blue-500 focus:ring-blue-500 dark:border-neutral-700'
+              : 'border-white/[0.1] focus:border-[#D71932] focus:ring-[#D71932]'
           }`}
         />
         {errors.message && (
-          <p id="contact-message-error" className="mt-1 text-[11px] text-red-500 flex items-center gap-1">
+          <p id="contact-message-error" className="mt-1 text-[11px] text-red-400 flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             <span>{errors.message}</span>
           </p>
@@ -288,7 +288,7 @@ export function ContactFormClient() {
           variant="primary"
           size="md"
           disabled={isSubmitting}
-          className="w-full justify-center bg-blue-600 hover:bg-blue-500 text-xs font-semibold py-2.5"
+          className="w-full justify-center bg-[#D71932] hover:bg-[#b01328] text-white text-xs font-bold uppercase tracking-wider py-2.5 shadow-[0_0_15px_rgba(215,25,50,0.35)] transition-all"
         >
           {isSubmitting ? (
             <>

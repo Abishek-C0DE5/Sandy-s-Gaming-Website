@@ -30,26 +30,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const t = localStorage.getItem('theme');
-                if (t === 'light') {
-                  document.documentElement.classList.remove('dark');
-                } else {
-                  document.documentElement.classList.add('dark');
-                }
-              } catch (e) {}
-            `,
-          }}
-        />
-      </head>
-      <body className="min-h-full flex flex-col bg-[#F8F9FA] text-[#111113] dark:bg-[#080809] dark:text-[#F7F7F8] selection:bg-[#D71932] selection:text-white transition-colors duration-200">
+      <body className="min-h-full flex flex-col bg-[#080809] text-[#F7F7F8] selection:bg-[#D71932] selection:text-white">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

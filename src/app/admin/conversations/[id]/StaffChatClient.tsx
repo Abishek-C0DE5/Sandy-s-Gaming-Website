@@ -95,9 +95,18 @@ export function StaffChatClient({
   const [revocationDetails, setRevocationDetails] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const channelRef = useRef<any>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Auto-scroll inside chat container strictly (never moves outer window or mobile viewport)
+  const scrollToBottom = (smooth = true) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
   };
 
   useEffect(() => {
@@ -119,6 +128,7 @@ export function StaffChatClient({
     });
 
     const channel = supabase.channel(topic);
+    channelRef.current = channel;
 
     channel
       .on(
@@ -248,6 +258,7 @@ export function StaffChatClient({
       });
 
     return () => {
+      channelRef.current = null;
       supabase.removeChannel(channel);
     };
   }, [conversationId, currentUser.id, isAccessRevoked]);
@@ -316,6 +327,28 @@ export function StaffChatClient({
     } else {
       setMessages((prev) => [...prev, optimisticMessage]);
       setInputText('');
+    }
+
+    // Immediately broadcast via WebSocket for sub-30ms instant peer delivery
+    try {
+      if (channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'new_message',
+          payload: {
+            id: tempId,
+            conversation_id: conversationId,
+            body: text,
+            message_type: 'text',
+            created_at: new Date().toISOString(),
+            sender_id: currentUser.id,
+            sender_role: currentUser.role,
+            sender_name: currentUser.displayName || 'Support Team',
+          },
+        });
+      }
+    } catch {
+      // Fallback silently to HTTP persistence
     }
 
     try {
@@ -550,7 +583,10 @@ export function StaffChatClient({
           </div>
 
           {/* Messages Scroll Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-neutral-50/30 dark:bg-neutral-950/20">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto p-6 space-y-4 bg-neutral-50/30 dark:bg-neutral-950/20"
+          >
             {hasMore && (
               <div className="flex justify-center pb-2">
                 <button

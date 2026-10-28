@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/client';
 import type { UserRole } from '@/types/database';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { MessageSquare, BookOpen, Image as ImageIcon, Mail, Shield, Menu, X, LogOut, User, LogIn } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -177,14 +176,10 @@ export function Navbar() {
               </Link>
             </div>
           )}
-
-          {/* Theme Toggle (Light / Dark) */}
-          <ThemeToggle />
         </div>
 
         {/* Mobile controls */}
         <div className="flex md:hidden items-center gap-2">
-          <ThemeToggle />
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

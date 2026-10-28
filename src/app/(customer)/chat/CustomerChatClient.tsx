@@ -69,10 +69,17 @@ export function CustomerChatClient({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const channelRef = useRef<any>(null);
 
-  // Auto-scroll to bottom on message updates (only if near bottom)
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Auto-scroll inside chat container strictly (never moves outer window or mobile viewport)
+  const scrollToBottom = (smooth = true) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
   };
 
   useEffect(() => {
@@ -97,6 +104,7 @@ export function CustomerChatClient({
     });
 
     const channel = supabase.channel(topic);
+    channelRef.current = channel;
 
     channel
       .on(
@@ -210,6 +218,7 @@ export function CustomerChatClient({
       });
 
     return () => {
+      channelRef.current = null;
       supabase.removeChannel(channel);
     };
   }, [conversation?.id, currentUserId]);
@@ -279,6 +288,28 @@ export function CustomerChatClient({
     } else {
       setMessages((prev) => [...prev, optimisticMessage]);
       setInputText('');
+    }
+
+    // Immediately broadcast via WebSocket for sub-30ms instant peer delivery
+    try {
+      if (channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'new_message',
+          payload: {
+            id: tempId,
+            conversation_id: conversation.id,
+            body: text,
+            message_type: 'text',
+            created_at: new Date().toISOString(),
+            sender_id: currentUserId,
+            sender_role: 'customer',
+            sender_name: customerDisplayName || 'Customer',
+          },
+        });
+      }
+    } catch {
+      // Fallback silently to HTTP persistence
     }
 
     try {

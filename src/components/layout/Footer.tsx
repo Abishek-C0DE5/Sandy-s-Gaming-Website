@@ -13,13 +13,6 @@ export function Footer() {
             <p className="max-w-md text-sm text-[#A5A5AD] leading-relaxed">
               Sandy&apos;s Gaming is an esports and gaming entertainment hub. Delivering exclusive articles, artwork galleries, and competitive tournament coverage with dedicated 24/7 staff support.
             </p>
-            <div className="flex items-center gap-2 text-xs font-mono text-[#F7F7F8]">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span>All Systems Operational &bull; 99.98% Uptime</span>
-            </div>
           </div>
 
           {/* Quick Links */}
