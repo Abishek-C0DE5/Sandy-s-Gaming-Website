@@ -94,16 +94,23 @@ export function ContactFormClient() {
     }
   };
 
+  const inputClass = (hasError: boolean) =>
+    `mt-1.5 w-full rounded-xl border bg-[var(--surface-secondary)] px-3.5 py-2.5 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-1 transition-all duration-300 ${
+      hasError
+        ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/30'
+        : 'border-white/[0.08] focus:border-[var(--brand-primary)]/50 focus:ring-[var(--brand-primary)]/30'
+    }`;
+
   if (isSuccess) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-6 text-center dark:border-emerald-900/50 dark:bg-emerald-950/20">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400 mb-3">
-          <CheckCircle2 className="h-6 w-6" />
+      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-8 text-center backdrop-blur-md">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl glass text-emerald-400 mb-3 animate-float">
+          <CheckCircle2 className="h-7 w-7" />
         </div>
-        <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+        <h3 className="text-lg font-bold text-white">
           Inquiry Successfully Sent!
         </h3>
-        <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300 max-w-md mx-auto leading-relaxed">
+        <p className="mt-2 text-xs text-[var(--text-secondary)] max-w-md mx-auto leading-relaxed">
           Thank you for contacting us. Your message has been routed to our staff inbox.
           We will review your inquiry and get back to you via email shortly.
         </p>
@@ -111,10 +118,10 @@ export function ContactFormClient() {
         <div className="mt-6">
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => setIsSuccess(false)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold"
+            className="inline-flex items-center gap-1.5"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Send Another Inquiry</span>
@@ -132,7 +139,7 @@ export function ContactFormClient() {
         </Alert>
       )}
 
-      {/* Anti-spam Honeypot (Visually hidden for screen readers & bots) */}
+      {/* Anti-spam Honeypot */}
       <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0 }}>
         <label htmlFor="form-website-field">Leave this empty</label>
         <input
@@ -150,9 +157,9 @@ export function ContactFormClient() {
       <div>
         <label
           htmlFor="contact-name"
-          className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
+          className="block text-xs font-semibold text-[var(--text-secondary)]"
         >
-          Your Name <span className="text-[#A5A5AD] font-normal normal-case">(Optional)</span>
+          Your Name <span className="text-[var(--text-muted)] font-normal">(Optional)</span>
         </label>
         <input
           id="contact-name"
@@ -161,7 +168,7 @@ export function ContactFormClient() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder="e.g. Alex Morgan"
           maxLength={100}
-          className="mt-1.5 w-full rounded-lg border border-white/[0.1] bg-[#171719] px-3.5 py-2.5 text-xs text-white placeholder:text-[#64646D] focus:border-[#D71932] focus:ring-1 focus:ring-[#D71932] focus:outline-none transition-colors"
+          className={inputClass(false)}
         />
       </div>
 
@@ -169,9 +176,9 @@ export function ContactFormClient() {
       <div>
         <label
           htmlFor="contact-email"
-          className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
+          className="block text-xs font-semibold text-[var(--text-secondary)]"
         >
-          Email Address <span className="text-[#D71932]">*</span>
+          Email Address <span className="text-[var(--brand-primary)]">*</span>
         </label>
         <input
           id="contact-email"
@@ -187,14 +194,10 @@ export function ContactFormClient() {
           }}
           placeholder="e.g. alex@example.com"
           maxLength={254}
-          className={`mt-1.5 w-full rounded-lg border px-3.5 py-2.5 text-xs text-white placeholder:text-[#64646D] focus:outline-none focus:ring-1 bg-[#171719] transition-colors ${
-            errors.email
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-white/[0.1] focus:border-[#D71932] focus:ring-[#D71932]'
-          }`}
+          className={inputClass(Boolean(errors.email))}
         />
         {errors.email && (
-          <p id="contact-email-error" className="mt-1 text-[11px] text-red-400 flex items-center gap-1">
+          <p id="contact-email-error" className="mt-1.5 text-[11px] text-red-400 flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             <span>{errors.email}</span>
           </p>
@@ -205,9 +208,9 @@ export function ContactFormClient() {
       <div>
         <label
           htmlFor="contact-phone"
-          className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
+          className="block text-xs font-semibold text-[var(--text-secondary)]"
         >
-          Phone Number with Country Code <span className="text-[#D71932]">*</span>
+          Phone Number with Country Code <span className="text-[var(--brand-primary)]">*</span>
         </label>
         <input
           id="contact-phone"
@@ -223,17 +226,13 @@ export function ContactFormClient() {
           }}
           placeholder="+1 555-726-3974"
           maxLength={25}
-          className={`mt-1.5 w-full rounded-lg border px-3.5 py-2.5 text-xs text-white placeholder:text-[#64646D] focus:outline-none focus:ring-1 bg-[#171719] transition-colors ${
-            errors.phone
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-white/[0.1] focus:border-[#D71932] focus:ring-[#D71932]'
-          }`}
+          className={inputClass(Boolean(errors.phone))}
         />
-        <p className="mt-1 text-[11px] text-[#A5A5AD]">
+        <p className="mt-1 text-[11px] text-[var(--text-muted)]">
           Include your country code (e.g. +1 for US/CA, +44 for UK, +977 for Nepal).
         </p>
         {errors.phone && (
-          <p id="contact-phone-error" className="mt-1 text-[11px] text-red-400 flex items-center gap-1">
+          <p id="contact-phone-error" className="mt-1.5 text-[11px] text-red-400 flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             <span>{errors.phone}</span>
           </p>
@@ -245,11 +244,11 @@ export function ContactFormClient() {
         <div className="flex items-center justify-between">
           <label
             htmlFor="contact-message"
-            className="block text-xs font-bold uppercase tracking-wider text-[#F7F7F8]"
+            className="block text-xs font-semibold text-[var(--text-secondary)]"
           >
-            Message <span className="text-[#D71932]">*</span>
+            Message <span className="text-[var(--brand-primary)]">*</span>
           </label>
-          <span className="text-[11px] text-[#A5A5AD]">
+          <span className="text-[11px] font-mono text-[var(--text-muted)]">
             {form.message.length} / 5000
           </span>
         </div>
@@ -267,14 +266,10 @@ export function ContactFormClient() {
           }}
           placeholder="Please describe how our team can assist you..."
           maxLength={5000}
-          className={`mt-1.5 w-full rounded-lg border p-3 text-xs text-white placeholder:text-[#64646D] focus:outline-none focus:ring-1 bg-[#171719] transition-colors ${
-            errors.message
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-white/[0.1] focus:border-[#D71932] focus:ring-[#D71932]'
-          }`}
+          className={inputClass(Boolean(errors.message))}
         />
         {errors.message && (
-          <p id="contact-message-error" className="mt-1 text-[11px] text-red-400 flex items-center gap-1">
+          <p id="contact-message-error" className="mt-1.5 text-[11px] text-red-400 flex items-center gap-1">
             <AlertCircle className="h-3 w-3" />
             <span>{errors.message}</span>
           </p>
@@ -288,7 +283,7 @@ export function ContactFormClient() {
           variant="primary"
           size="md"
           disabled={isSubmitting}
-          className="w-full justify-center bg-[#D71932] hover:bg-[#b01328] text-white text-xs font-bold uppercase tracking-wider py-2.5 shadow-[0_0_15px_rgba(215,25,50,0.35)] transition-all"
+          className="w-full justify-center"
         >
           {isSubmitting ? (
             <>

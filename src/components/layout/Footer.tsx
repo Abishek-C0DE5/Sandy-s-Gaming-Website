@@ -4,80 +4,69 @@ import { Shield, Sparkles, MessageSquare, BookOpen, ImageIcon, Mail } from 'luci
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.08] bg-[#080809] text-[#A5A5AD]">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="border-t border-white/[0.06] bg-[var(--background)]">
+      <div className="w-full max-w-[1720px] mx-auto px-4 py-14 sm:px-8 lg:px-12 xl:px-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
-            <BrandLogo size="md" withText={true} href="/" glow={true} />
-            <p className="max-w-md text-sm text-[#A5A5AD] leading-relaxed">
+            <BrandLogo size="md" withText={true} href="/" glow={false} />
+            <p className="max-w-md text-sm text-[var(--text-secondary)] leading-relaxed">
               Sandy&apos;s Gaming is an esports and gaming entertainment hub. Delivering exclusive articles, artwork galleries, and competitive tournament coverage with dedicated 24/7 staff support.
             </p>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#F7F7F8]">
-              Platform Navigation
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold tracking-wide text-[var(--text-primary)]">
+              Navigation
             </h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/blog" className="flex items-center gap-1.5 hover:text-[#D71932] transition-colors">
-                  <BookOpen className="h-3.5 w-3.5 text-[#D71932]" />
-                  <span>Esports Blogs</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/posts" className="flex items-center gap-1.5 hover:text-[#D71932] transition-colors">
-                  <ImageIcon className="h-3.5 w-3.5 text-[#D71932]" />
-                  <span>Art &amp; Posters Gallery</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="flex items-center gap-1.5 hover:text-[#D71932] transition-colors">
-                  <Mail className="h-3.5 w-3.5 text-[#D71932]" />
-                  <span>Contact Inquiries</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/chat" className="flex items-center gap-1.5 hover:text-[#D71932] transition-colors">
-                  <MessageSquare className="h-3.5 w-3.5 text-[#D71932]" />
-                  <span>Customer Live Chat</span>
-                </Link>
-              </li>
+            <ul className="space-y-2.5 text-sm">
+              {[
+                { href: '/blog', label: 'Esports Blogs', icon: BookOpen },
+                { href: '/posts', label: 'Art & Posters', icon: ImageIcon },
+                { href: '/contact', label: 'Contact', icon: Mail },
+                { href: '/chat', label: 'Live Chat', icon: MessageSquare },
+              ].map(({ href, label, icon: Icon }) => (
+                <li key={href}>
+                  <Link href={href} className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
+                    <Icon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                    <span>{label}</span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Staff Access & Security */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#F7F7F8]">
+          {/* Staff Access */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold tracking-wide text-[var(--text-primary)]">
               Staff &amp; Operations
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/login" className="hover:text-[#D71932] transition-colors">
-                  Sign In Portal
+                <Link href="/login" className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
+                  Sign In
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="flex items-center gap-1.5 hover:text-[#D71932] transition-colors">
-                  <Shield className="h-3.5 w-3.5 text-[#D71932]" />
+                <Link href="/admin" className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
+                  <Shield className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                   <span>Staff Workspace</span>
                 </Link>
               </li>
               <li>
-                <Link href="/super-admin" className="flex items-center gap-1.5 hover:text-[#D71932] transition-colors">
-                  <Sparkles className="h-3.5 w-3.5 text-[#D71932]" />
-                  <span>Super Admin Controls</span>
+                <Link href="/super-admin" className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
+                  <Sparkles className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                  <span>Super Admin</span>
                 </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between text-xs text-[#A5A5AD]/80 gap-4">
-          <p>&copy; 2026 SANDY&apos;S GAMING. All rights reserved.</p>
-          <p className="font-mono text-[11px]">Designed &bull; Engineered for Competitive Performance</p>
+        <div className="mt-14 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--text-muted)] gap-4">
+          <p>&copy; 2026 Sandy&apos;s Gaming. All rights reserved.</p>
+          <p className="font-mono text-[11px]">Built for competitive performance</p>
         </div>
       </div>
     </footer>

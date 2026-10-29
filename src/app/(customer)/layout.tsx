@@ -11,35 +11,35 @@ export default async function CustomerLayout({
   const profile = await getCurrentProfile();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="w-full max-w-[1720px] mx-auto px-4 py-8 sm:px-8 lg:px-12 xl:px-16">
       {/* Customer Header Shell */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-neutral-200 pb-5 dark:border-neutral-800 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.06] pb-5 gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center rounded-md bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+            <span className="inline-flex items-center rounded-full glass px-2.5 py-0.5 text-xs font-semibold text-[var(--brand-primary)]">
               Customer Portal
             </span>
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-[var(--text-muted)]">
               {profile?.display_name || user.email}
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="mt-1 text-2xl font-black tracking-tight text-[var(--text-primary)]">
             Support &amp; Account Center
           </h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <nav className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <nav className="flex items-center gap-1.5">
             <Link
               href="/chat"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-2 text-xs font-semibold text-[var(--text-primary)] hover:border-white/[0.15] hover:bg-white/[0.08] transition-all duration-300"
             >
-              <MessageSquare className="h-3.5 w-3.5" />
+              <MessageSquare className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
               <span>Live Chat</span>
             </Link>
             <Link
               href="/account"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.08] transition-all duration-300"
             >
               <User className="h-3.5 w-3.5" />
               <span>My Account</span>
@@ -49,7 +49,7 @@ export default async function CustomerLayout({
           {(profile?.role === 'admin' || profile?.role === 'super_admin') && (
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 transition-colors"
+              className="btn-primary inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white"
             >
               <Shield className="h-3.5 w-3.5" />
               <span>Staff Portal</span>
@@ -59,10 +59,11 @@ export default async function CustomerLayout({
           <form action="/auth/signout" method="post">
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-neutral-700 dark:hover:bg-red-950/30 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl glass px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-950/30 hover:border-red-500/30 transition-all duration-300"
+              title="Sign Out"
             >
               <LogOut className="h-3.5 w-3.5" />
-              <span>Sign Out</span>
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </form>
         </div>

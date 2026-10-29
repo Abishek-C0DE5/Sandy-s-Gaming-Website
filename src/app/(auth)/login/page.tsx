@@ -177,11 +177,13 @@ function LoginContent() {
     }
   };
 
+  const inputClassName = "block w-full rounded-xl border border-white/[0.08] bg-[var(--surface-secondary)] py-2.5 pr-3 pl-10 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--brand-primary)]/50 focus:ring-1 focus:ring-[var(--brand-primary)]/30 focus:outline-none transition-all duration-300";
+
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-white/[0.08] bg-[#101012] p-8 shadow-2xl">
+      <div className="w-full max-w-md space-y-6 rounded-2xl glass-elevated p-8">
         <div className="text-center">
-          <div className="mx-auto relative h-16 w-16 rounded-2xl overflow-hidden border border-[#D71932]/40 bg-[#171719] flex items-center justify-center shadow-[0_0_25px_rgba(215,25,50,0.35)] p-2">
+          <div className="mx-auto relative h-16 w-16 rounded-2xl overflow-hidden glass flex items-center justify-center p-2">
             <Image
               src="/brand/sandys-gaming-logo.png"
               alt="Sandy's Gaming"
@@ -191,26 +193,26 @@ function LoginContent() {
               priority
             />
           </div>
-          <h1 className="mt-4 text-2xl font-black uppercase tracking-wider text-white">
-            Sign In to Sandy&apos;s Gaming
+          <h1 className="mt-4 text-2xl font-black tracking-tight text-white">
+            Sign In
           </h1>
-          <p className="mt-2 text-sm text-[#A5A5AD]">
-            Select your preferred sign in method.
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            Select your preferred sign-in method.
           </p>
         </div>
 
-        {/* Primary Auth Mode Switcher (Password vs OTP) */}
-        <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#171719] p-1 border border-white/[0.06]">
+        {/* Primary Auth Mode Switcher */}
+        <div className="grid grid-cols-2 gap-1.5 rounded-xl glass p-1">
           <button
             type="button"
             onClick={() => {
               setAuthMode('password');
               setErrorMsg(null);
             }}
-            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition-all ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all duration-300 ${
               authMode === 'password'
-                ? 'bg-[#D71932] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]'
-                : 'text-[#A5A5AD] hover:text-white'
+                ? 'btn-primary text-white'
+                : 'text-[var(--text-secondary)] hover:text-white'
             }`}
           >
             <Lock className="h-3.5 w-3.5" />
@@ -222,10 +224,10 @@ function LoginContent() {
               setAuthMode('otp');
               setErrorMsg(null);
             }}
-            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition-all ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all duration-300 ${
               authMode === 'otp'
-                ? 'bg-[#D71932] text-white shadow-[0_0_12px_rgba(215,25,50,0.35)]'
-                : 'text-[#A5A5AD] hover:text-white'
+                ? 'btn-primary text-white'
+                : 'text-[var(--text-secondary)] hover:text-white'
             }`}
           >
             <KeyRound className="h-3.5 w-3.5" />
@@ -235,17 +237,17 @@ function LoginContent() {
 
         {/* Channel Switcher (if OTP mode & both enabled) */}
         {authMode === 'otp' && allowBoth && (
-          <div className="grid grid-cols-2 gap-2 rounded-xl bg-neutral-100/70 p-1 dark:bg-neutral-800/70">
+          <div className="grid grid-cols-2 gap-1.5 rounded-xl glass p-1">
             <button
               type="button"
               onClick={() => {
                 setActiveChannel('email');
                 setErrorMsg(null);
               }}
-              className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
+              className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all duration-300 ${
                 activeChannel === 'email'
-                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                  : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
+                  ? 'bg-white/[0.08] text-white'
+                  : 'text-[var(--text-secondary)] hover:text-white'
               }`}
             >
               <Mail className="h-3.5 w-3.5" />
@@ -257,10 +259,10 @@ function LoginContent() {
                 setActiveChannel('phone');
                 setErrorMsg(null);
               }}
-              className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
+              className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all duration-300 ${
                 activeChannel === 'phone'
-                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                  : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
+                  ? 'bg-white/[0.08] text-white'
+                  : 'text-[var(--text-secondary)] hover:text-white'
               }`}
             >
               <Phone className="h-3.5 w-3.5" />
@@ -270,14 +272,14 @@ function LoginContent() {
         )}
 
         {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-400">
+          <div className="flex items-center gap-2 rounded-xl border border-red-900/30 bg-red-950/20 p-3 text-sm text-red-400">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
+          <div className="flex items-center gap-2 rounded-xl border border-emerald-900/30 bg-emerald-950/20 p-3 text-sm text-emerald-400">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             <span>{successMsg}</span>
           </div>
@@ -287,11 +289,11 @@ function LoginContent() {
         {authMode === 'password' ? (
           <form onSubmit={handlePasswordLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
                 Email Address
               </label>
-              <div className="relative mt-1">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--text-muted)]">
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
@@ -303,17 +305,17 @@ function LoginContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className={inputClassName}
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <label htmlFor="password" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
                 Password
               </label>
-              <div className="relative mt-1">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--text-muted)]">
                   <Lock className="h-4 w-4" />
                 </div>
                 <input
@@ -325,7 +327,7 @@ function LoginContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className={inputClassName}
                 />
               </div>
             </div>
@@ -333,7 +335,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 disabled:opacity-50 transition-colors"
+              className="btn-primary flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50 transition-all"
             >
               {loading ? (
                 <>
@@ -342,7 +344,7 @@ function LoginContent() {
                 </>
               ) : (
                 <>
-                  <span>Sign In with Password</span>
+                  <span>Sign In</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -353,11 +355,11 @@ function LoginContent() {
           <form onSubmit={handleSendOtp} className="space-y-4">
             {activeChannel === 'email' ? (
               <div>
-                <label htmlFor="otp-email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <label htmlFor="otp-email" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
                   Email Address
                 </label>
-                <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--text-muted)]">
                     <Mail className="h-4 w-4" />
                   </div>
                   <input
@@ -369,17 +371,17 @@ function LoginContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    className={inputClassName}
                   />
                 </div>
               </div>
             ) : (
               <div>
-                <label htmlFor="otp-phone" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                  Phone Number (E.164 with Country Code)
+                <label htmlFor="otp-phone" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+                  Phone Number (with Country Code)
                 </label>
-                <div className="relative mt-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--text-muted)]">
                     <Phone className="h-4 w-4" />
                   </div>
                   <input
@@ -391,7 +393,7 @@ function LoginContent() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+1234567890"
-                    className="block w-full rounded-lg border border-neutral-300 bg-white py-2.5 pr-3 pl-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    className={inputClassName}
                   />
                 </div>
               </div>
@@ -400,7 +402,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 disabled:opacity-50 transition-colors"
+              className="btn-primary flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50 transition-all"
             >
               {loading ? (
                 <>
@@ -417,49 +419,42 @@ function LoginContent() {
           </form>
         )}
 
-        {/* Quick Test Accounts Autofill Helper */}
-        <div className="rounded-xl border border-white/[0.08] bg-[#171719] p-3 text-xs">
-          <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#A5A5AD]">
-            <User className="h-3.5 w-3.5 text-[#D71932]" />
-            <span>Test Personas (Click to autofill):</span>
+        {/* Quick Test Accounts */}
+        <div className="rounded-xl glass p-3.5 text-xs">
+          <div className="flex items-center gap-1.5 font-semibold text-[var(--text-muted)]">
+            <User className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
+            <span>Test Accounts (click to autofill):</span>
           </div>
           <div className="mt-2.5 grid grid-cols-3 gap-1.5">
-            <button
-              type="button"
-              onClick={() => fillTestCredentials('visitor.sandysgaming@gmail.com', 'TestPassword123!')}
-              className="rounded-lg border border-white/[0.08] bg-[#101012] px-2 py-1.5 text-center font-bold text-xs text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
-            >
-              Visitor
-            </button>
-            <button
-              type="button"
-              onClick={() => fillTestCredentials('admin.sandysgaming@gmail.com', 'TestPassword123!')}
-              className="rounded-lg border border-white/[0.08] bg-[#101012] px-2 py-1.5 text-center font-bold text-xs text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => fillTestCredentials('superadmin.sandysgaming@gmail.com', 'TestPassword123!')}
-              className="rounded-lg border border-white/[0.08] bg-[#101012] px-2 py-1.5 text-center font-bold text-xs text-[#A5A5AD] hover:border-[#D71932] hover:text-white transition-colors"
-            >
-              Super Admin
-            </button>
+            {[
+              { label: 'Visitor', email: 'visitor.sandysgaming@gmail.com' },
+              { label: 'Admin', email: 'admin.sandysgaming@gmail.com' },
+              { label: 'Super Admin', email: 'superadmin.sandysgaming@gmail.com' },
+            ].map(({ label, email: testEmail }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => fillTestCredentials(testEmail, 'TestPassword123!')}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-2 py-1.5 text-center font-semibold text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)]/30 hover:text-white transition-all duration-300"
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/[0.08] bg-[#171719]/50 p-3 text-center text-xs">
-          <span className="text-[#A5A5AD]">New to Sandy&apos;s Gaming? </span>
-          <Link href="/register" className="font-bold text-[#D71932] hover:underline">
+        <div className="rounded-xl glass p-3 text-center text-xs">
+          <span className="text-[var(--text-muted)]">New to Sandy&apos;s Gaming? </span>
+          <Link href="/register" className="font-semibold text-[var(--brand-primary)] hover:underline">
             Create an Account
           </Link>
         </div>
 
-        <div className="border-t border-white/[0.08] pt-4 text-center text-xs text-[#A5A5AD]">
+        <div className="border-t border-white/[0.06] pt-4 text-center text-xs text-[var(--text-muted)]">
           <p>
-            Are you a guest visitor? You don&apos;t need to log in to contact us.{' '}
-            <Link href="/contact" className="font-bold text-[#D71932] hover:underline">
-              Submit a Guest Inquiry
+            Guest visitor?{' '}
+            <Link href="/contact" className="font-semibold text-[var(--brand-primary)] hover:underline">
+              Submit an Inquiry
             </Link>
           </p>
         </div>
@@ -470,7 +465,11 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>}>
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 rounded-full border-2 border-[var(--brand-primary)]/20 border-t-[var(--brand-primary)] animate-spin" />
+      </div>
+    }>
       <LoginContent />
     </Suspense>
   );

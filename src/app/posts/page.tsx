@@ -3,12 +3,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
-import { Image as ImageIcon, Sparkles, ArrowRight, Layers } from 'lucide-react';
+import { Image as ImageIcon, Sparkles, ArrowRight, Layers, Flame } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 export const metadata: Metadata = {
-  title: 'Visual Gallery & Posters | ApexPublish',
-  description: 'Browse high-resolution architectural photography, creative posters, and visual design assets.',
+  title: 'Visual Gallery & Posters | Sandy\'s Gaming',
+  description: 'Browse high-resolution 4K wallpapers, esports artwork posters, and creative visual assets.',
 };
 
 interface PostsGalleryPageProps {
@@ -35,73 +35,60 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
   const galleryItems = posts || [];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
       {/* Gallery Header */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-neutral-200 pb-8 dark:border-neutral-800 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.06] pb-8 gap-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">
-            <Sparkles className="h-4 w-4" />
-            <span>Creative Showcase</span>
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
+            <Flame className="h-4 w-4" />
+            <span>Official Artwork &amp; Media</span>
           </div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
-            Visual Media &amp; Gallery
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--text-primary)] sm:text-4xl">
+            Visual Media &amp; Posters
           </h1>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 max-w-2xl">
-            Curated posters, 35mm architectural photography, and creative visual assets published by the Apex studio.
+          <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+            Curated high-res esports wallpapers, custom digital posters, and creative assets released by Sandy&apos;s Gaming.
           </p>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-2 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800 self-start md:self-auto">
-          <Link
-            href="/posts"
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              activeFilter === 'all'
-                ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
-            }`}
-          >
-            All Media
-          </Link>
-          <Link
-            href="/posts?type=poster"
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              activeFilter === 'poster'
-                ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
-            }`}
-          >
-            Posters
-          </Link>
-          <Link
-            href="/posts?type=photo"
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              activeFilter === 'photo'
-                ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-700 dark:text-white'
-                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400'
-            }`}
-          >
-            Photography
-          </Link>
+        <div className="flex items-center gap-1.5 rounded-2xl glass p-1 self-start md:self-auto">
+          {[
+            { key: 'all', label: 'All Media', href: '/posts' },
+            { key: 'poster', label: 'Posters', href: '/posts?type=poster' },
+            { key: 'photo', label: 'Wallpapers', href: '/posts?type=photo' },
+          ].map(({ key, label, href }) => (
+            <Link
+              key={key}
+              href={href}
+              className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 ${
+                activeFilter === key
+                  ? 'btn-primary text-white'
+                  : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
         </div>
       </div>
 
       {/* Gallery Grid */}
       <div className="mt-10">
         {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
+          <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-sm text-red-400">
             Failed to load gallery items from database. Please refresh or try again later.
           </div>
         ) : galleryItems.length === 0 ? (
           <EmptyState
             icon={ImageIcon}
             title={`No published ${activeFilter === 'all' ? 'gallery items' : activeFilter + 's'} found`}
-            description="Our creative studio is curating new visual works. Published posters and photography will appear here."
+            description="Our creative team is crafting new visual works. Published posters and wallpapers will appear here."
             action={
               activeFilter !== 'all' ? (
                 <Link
                   href="/posts"
-                  className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-semibold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900"
+                  className="btn-primary inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-white"
                 >
                   View All Gallery Works
                 </Link>
@@ -109,25 +96,25 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
             }
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryItems.map((item) => (
               <div
                 key={item.id}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-purple-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-purple-800"
+                className="gaming-card group relative flex flex-col overflow-hidden"
               >
                 {item.cover_image && (
-                  <div className="relative aspect-4/3 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--surface-secondary)]">
                     <Image
                       src={item.cover_image}
                       alt={item.title}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                       unoptimized
                     />
                     <div className="absolute top-3 left-3">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-neutral-900/80 px-2.5 py-0.5 text-[11px] font-semibold text-white backdrop-blur-xs uppercase tracking-wide">
-                        <Layers className="h-3 w-3" />
+                      <span className="inline-flex items-center gap-1 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] backdrop-blur-md uppercase tracking-wide">
+                        <Layers className="h-3 w-3 text-[var(--brand-primary)]" />
                         <span>{item.post_type}</span>
                       </span>
                     </div>
@@ -136,25 +123,25 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
 
                 <div className="flex flex-1 flex-col justify-between p-6">
                   <div>
-                    <h2 className="text-base font-bold tracking-tight text-neutral-900 group-hover:text-purple-600 dark:text-white dark:group-hover:text-purple-400 transition-colors">
+                    <h2 className="text-base font-bold tracking-tight text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300">
                       <Link href={`/posts/${encodeURIComponent(item.slug)}`}>
                         {item.title}
                       </Link>
                     </h2>
                     {item.excerpt && (
-                      <p className="mt-2 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 line-clamp-2">
+                      <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)] line-clamp-2">
                         {item.excerpt}
                       </p>
                     )}
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800/60">
+                  <div className="mt-4 pt-3 border-t border-white/[0.04]">
                     <Link
                       href={`/posts/${encodeURIComponent(item.slug)}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-primary)] group/link"
                     >
                       <span>View asset &amp; details</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/link:translate-x-1" />
                     </Link>
                   </div>
                 </div>

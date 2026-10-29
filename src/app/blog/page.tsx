@@ -3,12 +3,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
-import { BookOpen, Calendar, Clock, ArrowRight, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { BookOpen, Calendar, Clock, ArrowRight, ChevronLeft, ChevronRight, Search, Flame } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 export const metadata: Metadata = {
-  title: 'Blog & Articles | ApexPublish',
-  description: 'Explore engineering insights, modern web architecture, and platform design updates.',
+  title: 'Blog & Esports News | Sandy\'s Gaming',
+  description: 'Explore competitive tournament breakdowns, patch meta analysis, and Sandy\'s Gaming community updates.',
 };
 
 interface BlogPageProps {
@@ -45,25 +45,25 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   const blogList = posts || [];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-neutral-200 pb-8 dark:border-neutral-800 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.06] pb-8 gap-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-            <BookOpen className="h-4 w-4" />
-            <span>Articles &amp; Publication Feed</span>
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
+            <Flame className="h-4 w-4" />
+            <span>Sandy&apos;s Editorial &amp; Esports Feed</span>
           </div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
-            Latest Blog Articles
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--text-primary)] sm:text-4xl">
+            Latest Publications
           </h1>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 max-w-2xl">
-            In-depth guides on high-throughput web development, database security, and real-time multi-admin architectures.
+          <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+            In-depth guides on competitive gaming, esports rosters, and platform updates curated by Sandy&apos;s Gaming.
           </p>
         </div>
 
         {/* Search Input Bar */}
         <form method="get" action="/blog" className="relative w-full max-w-xs">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--text-muted)]">
             <Search className="h-4 w-4" />
           </div>
           <input
@@ -71,7 +71,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
             name="q"
             defaultValue={q || ''}
             placeholder="Search articles..."
-            className="block w-full rounded-xl border border-neutral-300 bg-white py-2 pr-3 pl-9 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+            className="block w-full rounded-xl border border-white/[0.08] bg-[var(--surface-secondary)] py-2.5 pr-3 pl-10 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--brand-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)]/30 transition-all duration-300"
           />
         </form>
       </div>
@@ -79,7 +79,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
       {/* Content Feed */}
       <div className="mt-10">
         {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
+          <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-sm text-red-400">
             Failed to load articles from database. Please refresh or try again later.
           </div>
         ) : blogList.length === 0 ? (
@@ -95,7 +95,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
               q ? (
                 <Link
                   href="/blog"
-                  className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-semibold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900"
+                  className="btn-primary inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-white"
                 >
                   Clear Search
                 </Link>
@@ -103,7 +103,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogList.map((post) => {
               const formattedDate = post.published_at
                 ? new Date(post.published_at).toLocaleDateString('en-US', {
@@ -116,55 +116,58 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
               return (
                 <article
                   key={post.id}
-                  className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-blue-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-blue-800"
+                  className="gaming-card group flex flex-col justify-between overflow-hidden"
                 >
                   <div>
                     {post.cover_image && (
-                      <div className="relative h-48 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+                      <div className="relative aspect-video w-full overflow-hidden bg-[var(--surface-secondary)]">
                         <Image
                           src={post.cover_image}
                           alt={post.title}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                           unoptimized
                         />
+                        <div className="absolute top-3 left-3 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]">
+                          BLOG
+                        </div>
                       </div>
                     )}
                     <div className="p-6">
-                      <div className="flex items-center gap-3 text-xs text-neutral-500 mb-3">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5 text-neutral-400" />
+                      <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] font-mono mb-3">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
                           <time dateTime={post.published_at || ''}>{formattedDate}</time>
                         </span>
-                        <span>&bull;</span>
+                        <span className="opacity-40">&bull;</span>
                         <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5 text-neutral-400" />
+                          <Clock className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                           <span>4 min read</span>
                         </span>
                       </div>
 
-                      <h2 className="text-lg font-bold tracking-tight text-neutral-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                      <h2 className="text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300 line-clamp-2">
                         <Link href={`/blog/${encodeURIComponent(post.slug)}`}>
                           {post.title}
                         </Link>
                       </h2>
 
                       {post.excerpt && (
-                        <p className="mt-2 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 line-clamp-3">
+                        <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)] line-clamp-3">
                           {post.excerpt}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  <div className="border-t border-neutral-100 p-6 pt-3 pb-4 dark:border-neutral-800/60">
+                  <div className="border-t border-white/[0.04] p-6 pt-3 pb-4">
                     <Link
                       href={`/blog/${encodeURIComponent(post.slug)}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-primary)] group/link"
                     >
                       <span>Read article</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/link:translate-x-1" />
                     </Link>
                   </div>
                 </article>
@@ -175,23 +178,23 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
 
         {/* Bounded Pagination Controls */}
         {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-between border-t border-neutral-200 pt-6 dark:border-neutral-800">
-            <div className="text-xs text-neutral-500">
-              Showing page <span className="font-semibold">{currentPage}</span> of{' '}
-              <span className="font-semibold">{totalPages}</span> ({totalCount} total articles)
+          <div className="mt-12 flex items-center justify-between border-t border-white/[0.06] pt-6">
+            <div className="text-xs text-[var(--text-muted)] font-mono">
+              Showing page <span className="font-semibold text-white">{currentPage}</span> of{' '}
+              <span className="font-semibold text-white">{totalPages}</span> ({totalCount} total articles)
             </div>
 
             <div className="flex items-center gap-2">
               {currentPage > 1 ? (
                 <Link
                   href={`/blog?page=${currentPage - 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
-                  className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                  className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition-all duration-300"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                   <span>Previous</span>
                 </Link>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-300 cursor-not-allowed dark:border-neutral-800 dark:text-neutral-700">
+                <span className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-1.5 text-xs font-semibold text-[var(--text-muted)] opacity-40 cursor-not-allowed">
                   <ChevronLeft className="h-3.5 w-3.5" />
                   <span>Previous</span>
                 </span>
@@ -200,13 +203,13 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
               {currentPage < totalPages ? (
                 <Link
                   href={`/blog?page=${currentPage + 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
-                  className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                  className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition-all duration-300"
                 >
                   <span>Next</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-300 cursor-not-allowed dark:border-neutral-800 dark:text-neutral-700">
+                <span className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-1.5 text-xs font-semibold text-[var(--text-muted)] opacity-40 cursor-not-allowed">
                   <span>Next</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </span>

@@ -55,12 +55,18 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
     body: post.body || '',
     cover_image: post.cover_image,
     media:
-      media?.map((m) => ({
-        storage_path: m.storage_path,
-        media_type: m.media_type,
-        alt_text: m.alt_text,
-        sort_order: m.sort_order,
-      })) || [],
+      media?.map((m) => {
+        const url = m.storage_path.startsWith('http://') || m.storage_path.startsWith('https://')
+          ? m.storage_path
+          : adminClient.storage.from('public-media').getPublicUrl(m.storage_path).data.publicUrl;
+        return {
+          storage_path: m.storage_path,
+          media_type: m.media_type,
+          alt_text: m.alt_text,
+          sort_order: m.sort_order,
+          url,
+        };
+      }) || [],
   };
 
   return (

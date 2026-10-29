@@ -14,9 +14,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label htmlFor={inputId} className="block text-xs font-semibold text-[var(--text-secondary)]">
             {label}
-            {props.required && <span className="ml-1 text-red-500">*</span>}
+            {props.required && <span className="ml-1 text-[var(--brand-primary)]">*</span>}
           </label>
         )}
         <div className="relative">
@@ -25,22 +25,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
-            className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 transition-colors focus:outline-hidden focus:ring-1 dark:bg-neutral-800 dark:text-white ${
+            className={`block w-full rounded-xl border bg-[var(--surface-secondary)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all duration-300 focus:outline-none focus:ring-1 ${
               error
-                ? 'border-red-500 focus:border-red-600 focus:ring-red-600 dark:border-red-600'
-                : 'border-neutral-300 focus:border-blue-600 focus:ring-blue-600 dark:border-neutral-700'
+                ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500/30'
+                : 'border-white/[0.08] focus:border-[var(--brand-primary)]/50 focus:ring-[var(--brand-primary)]/30'
             } ${className}`}
             {...props}
           />
         </div>
         {error && (
-          <p id={`${inputId}-error`} className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+          <p id={`${inputId}-error`} className="flex items-center gap-1.5 text-xs text-red-400">
             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         )}
         {!error && helperText && (
-          <p id={`${inputId}-helper`} className="text-xs text-neutral-500 dark:text-neutral-400">
+          <p id={`${inputId}-helper`} className="text-xs text-[var(--text-muted)]">
             {helperText}
           </p>
         )}

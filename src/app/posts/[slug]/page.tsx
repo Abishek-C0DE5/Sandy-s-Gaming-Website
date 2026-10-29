@@ -1,12 +1,22 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { ArrowLeft, Calendar, Layers, Sparkles } from 'lucide-react';
+import { ArrowLeft, Calendar, Layers, Sparkles, ExternalLink } from 'lucide-react';
 
 interface PostDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+function resolveImageUrl(supabase: { storage: { from: (bucket: string) => { getPublicUrl: (path: string) => { data: { publicUrl: string } } } } }, pathOrUrl: string | null | undefined): string {
+  if (!pathOrUrl) return '';
+  if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
+    return pathOrUrl;
+  }
+  const clean = pathOrUrl.startsWith('/') ? pathOrUrl.slice(1) : pathOrUrl;
+  return supabase.storage.from('public-media').getPublicUrl(clean).data.publicUrl;
 }
 
 export async function generateMetadata({ params }: PostDetailPageProps): Promise<Metadata> {
@@ -24,23 +34,26 @@ export async function generateMetadata({ params }: PostDetailPageProps): Promise
 
   if (!post) {
     return {
-      title: 'Gallery Asset Not Found | ApexPublish',
+      title: 'Gallery Asset Not Found | Sandy\'s Gaming',
       description: 'The requested visual media asset could not be located.',
     };
   }
 
+  const resolvedImage = resolveImageUrl(supabase, post.cover_image);
+
   return {
-    title: `${post.title} | ${post.post_type.toUpperCase()} Gallery`,
-    description: post.excerpt || `View high-resolution ${post.post_type} on ApexPublish.`,
+    title: `${post.title} | ${post.post_type.toUpperCase()} Gallery | Sandy's Gaming`,
+    description: post.excerpt || `View high-resolution ${post.post_type} on Sandy\'s Gaming.`,
     openGraph: {
       title: post.title,
       description: post.excerpt || '',
-      images: post.cover_image ? [{ url: post.cover_image }] : [],
+      images: resolvedImage ? [{ url: resolvedImage }] : [],
     },
   };
 }
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
+  await connection();
   const { slug } = await params;
 
   if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
@@ -70,11 +83,31 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     .eq('post_id', post.id)
     .order('sort_order', { ascending: true });
 
-  const galleryMedia = mediaItems && mediaItems.length > 0
-    ? mediaItems
-    : post.cover_image
-    ? [{ id: 'primary', storage_path: post.cover_image, alt_text: post.title, sort_order: 1 }]
-    : [];
+  // Resolve all image URLs properly (handling both relative storage paths and full URLs)
+  const resolvedMedia: Array<{ id: string; url: string; alt_text: string }> = [];
+
+  // 1. If cover_image exists, add it first
+  if (post.cover_image) {
+    resolvedMedia.push({
+      id: 'cover',
+      url: resolveImageUrl(supabase, post.cover_image),
+      alt_text: post.title,
+    });
+  }
+
+  // 2. Add attached media items, avoiding duplicates
+  if (mediaItems && mediaItems.length > 0) {
+    for (const item of mediaItems) {
+      const itemUrl = resolveImageUrl(supabase, item.storage_path);
+      if (itemUrl && !resolvedMedia.some((m) => m.url === itemUrl)) {
+        resolvedMedia.push({
+          id: item.id,
+          url: itemUrl,
+          alt_text: item.alt_text || post.title,
+        });
+      }
+    }
+  }
 
   const formattedDate = post.published_at
     ? new Date(post.published_at).toLocaleDateString('en-US', {
@@ -85,74 +118,93 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     : 'Recently published';
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
       {/* Top Breadcrumb */}
-      <div className="flex items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
         <Link
           href="/posts"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Gallery</span>
         </Link>
 
-        <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-semibold text-purple-700 dark:bg-purple-950 dark:text-purple-300 uppercase tracking-wide">
-          <Layers className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-1 text-xs font-semibold text-[var(--brand-primary)] uppercase tracking-wide">
+          <Layers className="h-3.5 w-3.5" />
           <span>{post.post_type}</span>
         </span>
       </div>
 
       {/* Main Asset Presentation */}
-      <div className="mt-8 space-y-6">
+      <div className="mt-8 space-y-8">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+          <h1 className="text-3xl sm:text-4xl xl:text-5xl font-black tracking-tight text-[var(--text-primary)]">
             {post.title}
           </h1>
-          <div className="mt-3 flex items-center gap-2 text-xs text-neutral-500">
-            <Calendar className="h-3.5 w-3.5 text-neutral-400" />
+          <div className="mt-3 flex items-center gap-2 text-xs text-[var(--text-muted)] font-mono">
+            <Calendar className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
             <time dateTime={post.published_at || ''}>{formattedDate}</time>
-            <span>&bull;</span>
-            <span>Apex Visual Studio</span>
+            <span className="opacity-40">&bull;</span>
+            <span>Sandy&apos;s Creative Studio</span>
           </div>
         </div>
 
         {/* Gallery Image Display */}
-        <div className="space-y-6">
-          {galleryMedia.map((m, idx) => (
-            <div
-              key={m.id || idx}
-              className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
-            >
-              <div className="relative aspect-16/10 w-full sm:aspect-16/9">
-                <Image
-                  src={m.storage_path}
-                  alt={m.alt_text || post.title}
-                  fill
-                  priority={idx === 0}
-                  sizes="(max-width: 1024px) 100vw, 1024px"
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
-              {m.alt_text && (
-                <div className="border-t border-neutral-200 bg-white/80 px-4 py-2 text-xs text-neutral-600 backdrop-blur-xs dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-neutral-400">
-                  {m.alt_text}
+        {resolvedMedia.length > 0 ? (
+          <div className="space-y-8">
+            {resolvedMedia.map((m, idx) => (
+              <div
+                key={m.id || idx}
+                className="relative overflow-hidden rounded-3xl glass-elevated group"
+              >
+                <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full bg-[var(--surface-secondary)]">
+                  <Image
+                    src={m.url}
+                    alt={m.alt_text || post.title}
+                    fill
+                    priority={idx === 0}
+                    sizes="(max-width: 1720px) 100vw, 1720px"
+                    className="object-contain sm:object-cover transition-transform duration-700 ease-out group-hover:scale-[1.01]"
+                    unoptimized
+                  />
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <a
+                      href={m.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl glass px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/[0.1] shadow-xl"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span>View Full Resolution</span>
+                    </a>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+                {m.alt_text && m.alt_text !== post.title && (
+                  <div className="border-t border-white/[0.06] bg-black/40 px-5 py-3 text-xs text-[var(--text-secondary)] backdrop-blur-md">
+                    {m.alt_text}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-3xl glass p-12 text-center text-sm text-[var(--text-muted)]">
+            No image attached to this visual post.
+          </div>
+        )}
 
         {/* Description & Narrative */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-          <div className="flex items-center gap-2 text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider mb-2">
-            <Sparkles className="h-4 w-4" />
-            <span>Creative Notes</span>
+        {(post.body || post.excerpt) && (
+          <div className="rounded-3xl glass-elevated p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[var(--brand-primary)] tracking-wide mb-3">
+              <Sparkles className="h-4 w-4" />
+              <span>Creative Notes</span>
+            </div>
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)] whitespace-pre-line">
+              {post.body || post.excerpt}
+            </p>
           </div>
-          <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
-            {post.body || post.excerpt || 'No description provided.'}
-          </p>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -1,163 +1,145 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { SlotMachineIntro } from './SlotMachineIntro';
-import { LogoReveal } from './LogoReveal';
-import { MainHeroContent } from './MainHeroContent';
-import { FastForward } from 'lucide-react';
-
-export type IntroPhase =
-  | 'idle'
-  | 'entering'
-  | 'spinning'
-  | 'stopping'
-  | 'winning'
-  | 'logo-reveal'
-  | 'transitioning'
-  | 'complete';
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import {
+  ArrowRight,
+  BookOpen,
+  MessageSquare,
+  Sparkles,
+  Trophy,
+  ShieldCheck,
+  Flame,
+  ImageIcon,
+} from 'lucide-react';
 
 export function CinematicHeroContainer() {
-  const [phase, setPhase] = useState<IntroPhase>('idle');
-  const [mounted, setMounted] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
-  const completeIntro = useCallback(() => {
-    setPhase('complete');
-    try {
-      sessionStorage.setItem('sandys_intro_seen', 'true');
-    } catch {
-      // Ignore storage limitations
-    }
-  }, []);
-
-  const startIntroSequence = useCallback(() => {
-    setPhase('entering');
-  }, []);
-
-  // Handle escape key to skip intro
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && phase !== 'complete') {
-        completeIntro();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, completeIntro]);
-
-  // Initial mount check: respect reduced motion or session preference
-  useEffect(() => {
-    setMounted(true);
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hasSeenIntro = sessionStorage.getItem('sandys_intro_seen') === 'true';
-
-    if (prefersReducedMotion || hasSeenIntro) {
-      setPhase('complete');
-      return;
-    }
-
-    // Begin sequence on first visit
-    const startTimer = setTimeout(() => {
-      startIntroSequence();
-    }, 200);
-
-    return () => clearTimeout(startTimer);
-  }, [startIntroSequence]);
-
-  // State machine timer progression
-  useEffect(() => {
-    if (phase === 'entering') {
-      const timer = setTimeout(() => setPhase('spinning'), 600);
-      return () => clearTimeout(timer);
-    }
-    if (phase === 'spinning') {
-      const timer = setTimeout(() => setPhase('stopping'), 1400);
-      return () => clearTimeout(timer);
-    }
-    if (phase === 'stopping') {
-      const timer = setTimeout(() => setPhase('winning'), 1200);
-      return () => clearTimeout(timer);
-    }
-    if (phase === 'winning') {
-      const timer = setTimeout(() => setPhase('logo-reveal'), 1600);
-      return () => clearTimeout(timer);
-    }
-    if (phase === 'logo-reveal') {
-      const timer = setTimeout(() => setPhase('transitioning'), 2200);
-      return () => clearTimeout(timer);
-    }
-    if (phase === 'transitioning') {
-      const timer = setTimeout(() => completeIntro(), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [phase, completeIntro]);
-
-  // Replay intro function
-  const handleReplay = () => {
-    try {
-      sessionStorage.removeItem('sandys_intro_seen');
-    } catch {
-      // Ignore
-    }
-    setPhase('entering');
-  };
-
-  // SSR skeleton placeholder until mounted
-  if (!mounted) {
-    return (
-      <div className="min-h-[500px] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-2 border-[#D71932] border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
-  // If complete, render the full homepage hero
-  if (phase === 'complete') {
-    return <MainHeroContent onReplayIntro={handleReplay} />;
-  }
-
-  // Active Cinematic Animation Sequence
   return (
-    <section className="relative min-h-[580px] sm:min-h-[640px] flex flex-col items-center justify-center px-4 overflow-hidden bg-[#080809]">
-      {/* Top Floating Controls */}
-      <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={completeIntro}
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.12] bg-[#101012]/80 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-[#A5A5AD] hover:text-white hover:border-[#D71932]/60 hover:bg-[#171719] transition-all"
+    <section className="relative min-h-[640px] lg:min-h-[720px] xl:min-h-[780px] w-full flex items-center overflow-hidden border-b border-white/[0.06]">
+      {/* 1. Looping Background Video (Audio Removed / Muted, Hardware Accelerated) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          onLoadedData={() => setVideoLoaded(true)}
+          className={`h-full w-full object-cover scale-[1.02] filter brightness-[0.75] contrast-[1.08] transition-opacity duration-1000 ${
+            videoLoaded ? 'opacity-40' : 'opacity-0'
+          }`}
         >
-          <FastForward className="h-3.5 w-3.5 text-[#D71932]" />
-          <span>Skip Intro</span>
-          <kbd className="hidden sm:inline-block ml-1 px-1 py-0.5 rounded text-[10px] bg-white/[0.08] text-white">Esc</kbd>
-        </button>
+          <source src="/hero-bg.mp4" type="video/mp4" />
+        </video>
+
+        {/* 2. Color overlays blending with Sandy's Gaming theme */}
+        {/* Deep dark gradient from left and bottom for crystal-clear text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--background)] via-[var(--background)]/80 lg:via-[var(--background)]/65 to-transparent" />
+
+        {/* Subtle crimson ambient vignette from brand primary color */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,54,75,0.06)_0%,transparent_75%)]" />
+
+        {/* Seamless bottom transition into the next section */}
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-[var(--background)]" />
       </div>
 
-      {/* Atmospheric Background Streaks */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#D71932]/10 blur-[130px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(#171719_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
+      {/* 3. Hero Content Foreground Container */}
+      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 py-16 sm:px-8 lg:px-12 xl:px-16">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          {/* Left Column: Brand Copy & Actions */}
+          <div className="lg:col-span-7 space-y-7 text-center lg:text-left">
+            {/* Live Status Badge */}
+            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full glass px-3.5 py-1.5 text-xs text-[var(--text-secondary)]">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--brand-primary)] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--brand-primary)]" />
+              </span>
+              <Flame className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
+              <span className="font-medium tracking-wide">
+                Next-Gen Gaming &amp; Community Hub
+              </span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="animate-fade-up-delay-1 text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tight text-[var(--text-primary)] leading-[1.05]">
+              Dominate the <br className="hidden sm:inline" />
+              <span className="premium-text-gradient">
+                Gaming Arena
+              </span>
+            </h1>
+
+            {/* Description */}
+            <p className="animate-fade-up-delay-2 max-w-2xl text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed mx-auto lg:mx-0">
+              Welcome to <span className="text-[var(--text-primary)] font-semibold">Sandy&apos;s Gaming</span>. Unrivaled competitive tournaments, esports news, exclusive artwork, and direct 24/7 staff live chat support.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="animate-fade-up-delay-3 flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-1">
+              <Link
+                href="/blog"
+                className="btn-primary inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span>Explore Articles</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <Link
+                href="/chat"
+                className="btn-ghost inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-[var(--text-primary)]"
+              >
+                <MessageSquare className="h-4 w-4 text-[var(--brand-primary)]" />
+                <span>Live Support</span>
+              </Link>
+
+              <Link
+                href="/posts"
+                className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 text-xs font-semibold text-[var(--text-secondary)] hover:text-white glass transition-all duration-300"
+              >
+                <ImageIcon className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
+                <span>Artwork Gallery</span>
+              </Link>
+            </div>
+
+            {/* Trust Highlights */}
+            <div className="animate-fade-up-delay-3 pt-8 border-t border-white/[0.06] grid grid-cols-3 gap-6 text-center lg:text-left">
+              {[
+                { value: '24/7', label: 'Live Support', icon: ShieldCheck },
+                { value: '100%', label: 'Verified Tourneys', icon: Trophy },
+                { value: 'PRO', label: 'Curated Content', icon: Sparkles },
+              ].map(({ value, label, icon: Icon }) => (
+                <div key={label} className="group">
+                  <div className="text-xl sm:text-2xl font-black text-[var(--text-primary)] transition-colors group-hover:text-[var(--brand-primary)] duration-300">
+                    {value}
+                  </div>
+                  <div className="text-xs text-[var(--text-muted)] flex items-center justify-center lg:justify-start gap-1 mt-0.5 font-mono">
+                    <Icon className="h-3 w-3 text-[var(--brand-primary)]" />
+                    <span>{label}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Clean Hero Brand Logo (No artificial border highlight box) */}
+          <div className="lg:col-span-5 flex justify-center items-center animate-fade-up-delay-2">
+            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 animate-float flex items-center justify-center select-none">
+              <Image
+                src="/brand/sandys-gaming-logo.png"
+                alt="SANDY'S GAMING"
+                fill
+                priority
+                sizes="(max-width: 768px) 256px, (max-width: 1024px) 320px, 384px"
+                className="object-contain drop-shadow-2xl transition-transform duration-700 ease-out hover:scale-105"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Phase A/B/C: Slot Machine Sequence */}
-      {(phase === 'entering' || phase === 'spinning' || phase === 'stopping' || phase === 'winning') && (
-        <div className="relative z-20 w-full flex justify-center animate-in fade-in zoom-in-95 duration-500">
-          <SlotMachineIntro phase={phase} />
-        </div>
-      )}
-
-      {/* Phase D: Dark Cinematic Logo Reveal */}
-      {phase === 'logo-reveal' && (
-        <div className="relative z-20 w-full flex justify-center">
-          <LogoReveal />
-        </div>
-      )}
-
-      {/* Phase E: Transitioning into Hero */}
-      {phase === 'transitioning' && (
-        <div className="relative z-20 w-full flex justify-center animate-out fade-out duration-700">
-          <LogoReveal />
-        </div>
-      )}
     </section>
   );
 }

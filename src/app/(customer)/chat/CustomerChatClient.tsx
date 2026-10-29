@@ -432,14 +432,14 @@ export function CustomerChatClient({
     <div className="space-y-4">
       {/* Alert Banner if any */}
       {errorBanner && (
-        <div className="flex items-center justify-between rounded-xl bg-red-50 p-4 border border-red-200 text-red-800 dark:bg-red-950/40 dark:border-red-800 dark:text-red-200 text-xs">
+        <div className="flex items-center justify-between rounded-xl bg-red-950/30 p-4 border border-red-500/30 text-red-300 text-xs backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+            <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
             <span>{errorBanner}</span>
           </div>
           <button
             onClick={() => setErrorBanner(null)}
-            className="text-red-600 hover:text-red-800 dark:text-red-400 font-semibold text-xs ml-3"
+            className="text-red-400 hover:text-red-300 font-semibold text-xs ml-3"
           >
             Dismiss
           </button>
@@ -447,24 +447,24 @@ export function CustomerChatClient({
       )}
 
       {/* Main Chat Workspace Shell */}
-      <div className="rounded-2xl border border-neutral-200 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden flex flex-col h-[650px]">
+      <div className="rounded-3xl glass-elevated overflow-hidden flex flex-col h-[650px]">
         {/* Chat Header */}
-        <div className="border-b border-neutral-200 bg-neutral-50/70 px-6 py-4 dark:border-neutral-800 dark:bg-neutral-900/70 flex items-center justify-between">
+        <div className="border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--brand-primary)] text-white shadow-[0_0_20px_rgba(215,25,50,0.4)]">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">
+                <h2 className="text-sm font-bold text-[var(--text-primary)]">
                   Support Team
                 </h2>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 rounded-full glass px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Verified Specialists
                 </span>
               </div>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-[var(--text-muted)] font-mono">
                 {conversation
                   ? `Thread #${conversation.id.slice(0, 8)} • ${conversation.subject || 'General Support'}`
                   : 'Starting support thread...'}
@@ -475,12 +475,12 @@ export function CustomerChatClient({
           <div className="flex items-center gap-2">
             {conversation && (
               <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize glass ${
                   conversation.status === 'open'
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400'
+                    ? 'text-emerald-400 border-emerald-500/30'
                     : conversation.status === 'in_progress'
-                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
-                    : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
+                    ? 'text-amber-400 border-amber-500/30'
+                    : 'text-[var(--text-muted)]'
                 }`}
               >
                 {conversation.status.replace('_', ' ')}
@@ -490,12 +490,12 @@ export function CustomerChatClient({
             {/* Realtime Live Delivery Pill */}
             {conversation && (
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-medium glass ${
                   realtimeStatus === 'connected'
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                    ? 'text-emerald-400 border-emerald-500/30'
                     : realtimeStatus === 'connecting'
-                    ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-400'
-                    : 'border-neutral-200 bg-neutral-100 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400'
+                    ? 'text-amber-400 border-amber-500/30'
+                    : 'text-[var(--text-muted)]'
                 }`}
                 title={
                   realtimeStatus === 'connected'
@@ -507,13 +507,13 @@ export function CustomerChatClient({
               >
                 {realtimeStatus === 'connected' ? (
                   <>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <Wifi className="h-2.5 w-2.5" />
                     <span>Live</span>
                   </>
                 ) : realtimeStatus === 'connecting' ? (
                   <>
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
                     <span>Connecting...</span>
                   </>
                 ) : (
@@ -529,7 +529,7 @@ export function CustomerChatClient({
               <button
                 type="button"
                 onClick={() => handleUpdateStatus('resolved')}
-                className="text-xs font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white border border-neutral-300 dark:border-neutral-700 rounded-lg px-2.5 py-1 transition-colors"
+                className="text-xs font-semibold text-[var(--text-secondary)] hover:text-white glass rounded-xl px-3 py-1 transition-all duration-300"
                 title="Mark this conversation as resolved"
               >
                 Mark Resolved
@@ -541,7 +541,7 @@ export function CustomerChatClient({
                 type="button"
                 disabled={isStartingNew}
                 onClick={handleStartNewConversation}
-                className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900 rounded-lg px-2.5 py-1 transition-colors"
+                className="btn-primary text-xs font-semibold text-white rounded-xl px-3 py-1"
               >
                 {isStartingNew ? 'Starting...' : 'New Chat'}
               </button>
@@ -552,7 +552,7 @@ export function CustomerChatClient({
         {/* Message Thread Scroll Area */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-6 space-y-4 bg-neutral-50/30 dark:bg-neutral-950/20"
+          className="flex-1 overflow-y-auto p-6 space-y-4 bg-black/20"
         >
           {/* Bounded Pagination Load Earlier Button */}
           {hasMore && (
@@ -561,7 +561,7 @@ export function CustomerChatClient({
                 type="button"
                 disabled={isLoadingMore}
                 onClick={handleLoadEarlier}
-                className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs font-medium text-neutral-600 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 shadow-2xs transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full glass px-3.5 py-1 text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition-all duration-300"
               >
                 {isLoadingMore ? (
                   <>
@@ -578,13 +578,13 @@ export function CustomerChatClient({
           {/* Empty Conversation State */}
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl glass text-[var(--brand-primary)] animate-float">
                 <MessageSquare className="h-6 w-6" />
               </div>
-              <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">
+              <h3 className="text-base font-bold text-[var(--text-primary)]">
                 How can we help today, {customerDisplayName}?
               </h3>
-              <p className="text-xs text-neutral-500 max-w-sm">
+              <p className="text-xs text-[var(--text-secondary)] max-w-sm leading-relaxed">
                 Our support team is ready to assist you. Send a message below to start your conversation with a dedicated gaming specialist.
               </p>
             </div>
@@ -597,11 +597,11 @@ export function CustomerChatClient({
             return (
               <div
                 key={msg.id}
-                className={`flex flex-col ${isSelf ? 'items-end' : 'items-start'}`}
+                className={`flex flex-col ${isSelf ? 'items-end' : 'items-start'} animate-fade-up`}
               >
                 {/* Sender Name & Role Label */}
-                <div className="flex items-center gap-1.5 mb-1 px-1 text-[11px] text-neutral-400">
-                  <span className="font-medium text-neutral-600 dark:text-neutral-300">
+                <div className="flex items-center gap-1.5 mb-1 px-1 text-[11px] text-[var(--text-muted)]">
+                  <span className="font-semibold text-[var(--text-secondary)]">
                     {msg.sender_name}
                   </span>
                   <span>•</span>
@@ -615,10 +615,10 @@ export function CustomerChatClient({
 
                 {/* Bubble Container */}
                 <div
-                  className={`max-w-md rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-xs whitespace-pre-wrap break-words ${
+                  className={`max-w-md rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words transition-all duration-300 ${
                     isSelf
-                      ? 'bg-blue-600 text-white rounded-tr-xs'
-                      : 'bg-white border border-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white rounded-tl-xs'
+                      ? 'bg-gradient-to-r from-[var(--brand-primary)] to-[#b01328] text-white rounded-tr-xs shadow-[0_4px_20px_rgba(215,25,50,0.3)]'
+                      : 'glass-elevated text-[var(--text-primary)] rounded-tl-xs'
                   }`}
                 >
                   {/* Safe text rendering (no dangerous innerHTML) */}
@@ -627,13 +627,13 @@ export function CustomerChatClient({
 
                 {/* Status indicator: only display if transmission failed with retry button */}
                 {isSelf && msg.status === 'failed' && (
-                  <div className="mt-1 flex items-center gap-1.5 px-1 text-[10px] text-red-500 font-medium">
+                  <div className="mt-1 flex items-center gap-1.5 px-1 text-[10px] text-red-400 font-medium">
                     <XCircle className="h-3 w-3" />
                     <span>Failed to send</span>
                     <button
                       type="button"
                       onClick={() => handleSendMessage(msg.body, msg.id)}
-                      className="inline-flex items-center gap-0.5 underline hover:text-red-400 ml-1"
+                      className="inline-flex items-center gap-0.5 underline hover:text-red-300 ml-1"
                     >
                       <RotateCcw className="h-2.5 w-2.5" />
                       <span>Retry</span>
@@ -649,11 +649,11 @@ export function CustomerChatClient({
 
         {/* Closed Thread Banner if closed */}
         {conversation && conversation.status === 'closed' && (
-          <div className="bg-neutral-100 dark:bg-neutral-800 px-6 py-2.5 border-t border-neutral-200 dark:border-neutral-700 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-300">
+          <div className="glass px-6 py-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-[var(--text-secondary)]">
             <span>This conversation is closed. Sending a new message will automatically reopen it.</span>
             <button
               onClick={() => handleUpdateStatus('open')}
-              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs font-semibold text-[var(--brand-primary)] hover:underline ml-2"
             >
               Reopen Now
             </button>
@@ -661,7 +661,7 @@ export function CustomerChatClient({
         )}
 
         {/* Message Input Bar (Never blocks user input - Instant Messenger feel) */}
-        <div className="border-t border-neutral-200 p-4 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="border-t border-white/[0.06] p-4 bg-white/[0.01]">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -677,10 +677,10 @@ export function CustomerChatClient({
                 placeholder="Type your message to Support Team..."
                 maxLength={5000}
                 disabled={!conversation}
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 disabled:opacity-50"
+                className="w-full rounded-xl border border-white/[0.08] bg-[var(--surface-secondary)] px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--brand-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)]/30 disabled:opacity-50 transition-all duration-300"
               />
               {inputText.length > 3000 && (
-                <span className="absolute right-3 top-3 text-[10px] text-neutral-400">
+                <span className="absolute right-3 top-3.5 text-[10px] font-mono text-[var(--text-muted)]">
                   {inputText.length}/5000
                 </span>
               )}
@@ -689,7 +689,7 @@ export function CustomerChatClient({
             <button
               type="submit"
               disabled={!inputText.trim() || !conversation}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors shrink-0"
+              className="btn-primary inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             >
               <Send className="h-4 w-4" />
               <span>Send</span>

@@ -8,12 +8,9 @@ import {
   BookOpen,
   MessageSquare,
   ArrowRight,
-  ShieldCheck,
   Calendar,
   Sparkles,
   Flame,
-  Swords,
-  Palette,
   Users,
 } from 'lucide-react';
 
@@ -21,14 +18,14 @@ export default async function HomePage() {
   await connection();
   const supabase = await createClient();
 
-  // Query recent feed posts (both articles and posters for the social feed)
+  // Query recent feed posts (both articles and posters for the progressive feed)
   const { data: feedPosts } = await supabase
     .from('posts')
     .select('id, title, slug, excerpt, body, cover_image, post_type, published_at, created_at')
     .eq('status', 'published')
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
-    .limit(8);
+    .limit(18);
 
   // Query recent published blog articles (limit 3)
   const { data: recentBlogs } = await supabase
@@ -54,31 +51,31 @@ export default async function HomePage() {
   const gallery = recentGallery || [];
 
   return (
-    <div className="relative isolate overflow-hidden space-y-24 bg-[#080809] text-[#F7F7F8]">
+    <div className="relative isolate overflow-hidden space-y-28">
       {/* 1. Cinematic Slot-Reveal Hero Container */}
       <CinematicHeroContainer />
 
-      {/* 2. Facebook-Style Community & Esports Social Feed */}
+      {/* 2. Community & Esports Social Feed (Fluid Full-Width Grid with Progressive Step-by-Step Loading) */}
       <section className="relative">
         <SocialFeed initialPosts={feedPosts || []} />
       </section>
 
-      {/* 3. Featured Esports Articles Section (Real Data from Supabase) */}
+      {/* 3. Featured Esports Articles Section (Fluid Full-Width) */}
       {blogs.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.08] pb-4 gap-4">
+        <section className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.06] pb-4 gap-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#D71932]">
+              <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
                 <BookOpen className="h-4 w-4" />
                 <span>Editorial Feed</span>
               </div>
-              <h2 className="mt-1 text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#F7F7F8]">
+              <h2 className="mt-1 text-2xl sm:text-3xl xl:text-4xl font-black tracking-tight text-[var(--text-primary)]">
                 Recent Publications
               </h2>
             </div>
             <Link
               href="/blog"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A5A5AD] hover:text-[#D71932] transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300"
             >
               <span>View All Articles</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -89,30 +86,31 @@ export default async function HomePage() {
             {blogs.map((post) => (
               <article
                 key={post.id}
-                className="gaming-card group flex flex-col overflow-hidden rounded-2xl"
+                className="gaming-card group flex flex-col overflow-hidden"
               >
-                <div className="relative aspect-video w-full overflow-hidden bg-[#171719]">
+                {/* Image without border highlights */}
+                <div className="relative aspect-video w-full overflow-hidden bg-[var(--surface-secondary)]">
                   {post.cover_image ? (
                     <Image
                       src={post.cover_image}
                       alt={post.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-neutral-600">
-                      <BookOpen className="h-10 w-10 opacity-30" />
+                    <div className="flex h-full w-full items-center justify-center text-[var(--text-muted)]">
+                      <BookOpen className="h-10 w-10 opacity-20" />
                     </div>
                   )}
-                  <div className="absolute top-3 left-3 rounded-full bg-[#080809]/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-[#D71932] border border-white/[0.08]">
+                  <div className="absolute top-3 left-3 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]">
                     BLOG
                   </div>
                 </div>
 
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="flex items-center gap-2 text-xs text-[#A5A5AD] font-mono">
-                    <Calendar className="h-3.5 w-3.5 text-[#D71932]" />
+                <div className="flex flex-1 flex-col p-6">
+                  <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] font-mono">
+                    <Calendar className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
                     <time dateTime={post.published_at || ''}>
                       {post.published_at
                         ? new Date(post.published_at).toLocaleDateString('en-US', {
@@ -124,7 +122,7 @@ export default async function HomePage() {
                     </time>
                   </div>
 
-                  <h3 className="mt-2 text-base font-bold text-[#F7F7F8] group-hover:text-[#D71932] transition-colors line-clamp-2">
+                  <h3 className="mt-2.5 text-base sm:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300 line-clamp-2">
                     <Link href={`/blog/${post.slug}`}>
                       <span className="absolute inset-0" />
                       {post.title}
@@ -132,14 +130,14 @@ export default async function HomePage() {
                   </h3>
 
                   {post.excerpt && (
-                    <p className="mt-2 text-xs text-[#A5A5AD] line-clamp-2 leading-relaxed">
+                    <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
                       {post.excerpt}
                     </p>
                   )}
 
-                  <div className="mt-auto pt-4 flex items-center gap-1 text-xs font-semibold text-[#D71932]">
+                  <div className="mt-auto pt-4 flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-primary)]">
                     <span>Read Article</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
                 </div>
               </article>
@@ -148,22 +146,22 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 4. Posters & Visual Media Showcase */}
+      {/* 4. Posters & Visual Media Showcase (Fluid Full-Width) */}
       {gallery.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.08] pb-4 gap-4">
+        <section className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.06] pb-4 gap-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#D71932]">
+              <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
                 <Flame className="h-4 w-4" />
                 <span>Gallery &amp; Artwork</span>
               </div>
-              <h2 className="mt-1 text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#F7F7F8]">
+              <h2 className="mt-1 text-2xl sm:text-3xl xl:text-4xl font-black tracking-tight text-[var(--text-primary)]">
                 Featured Posters &amp; Visuals
               </h2>
             </div>
             <Link
               href="/posts"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A5A5AD] hover:text-[#D71932] transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300"
             >
               <span>Explore Gallery</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -174,29 +172,30 @@ export default async function HomePage() {
             {gallery.map((post) => (
               <article
                 key={post.id}
-                className="gaming-card group flex flex-col overflow-hidden rounded-2xl"
+                className="gaming-card group flex flex-col overflow-hidden"
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#171719]">
+                {/* Clean image container without border highlights */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--surface-secondary)]">
                   {post.cover_image ? (
                     <Image
                       src={post.cover_image}
                       alt={post.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-neutral-600">
-                      <Sparkles className="h-10 w-10 opacity-30" />
+                    <div className="flex h-full w-full items-center justify-center text-[var(--text-muted)]">
+                      <Sparkles className="h-10 w-10 opacity-20" />
                     </div>
                   )}
-                  <div className="absolute top-3 left-3 rounded-full bg-[#080809]/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-[#D71932] border border-white/[0.08] uppercase">
+                  <div className="absolute top-3 left-3 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] capitalize">
                     {post.post_type}
                   </div>
                 </div>
 
-                <div className="p-4">
-                  <h3 className="text-sm font-bold text-[#F7F7F8] group-hover:text-[#D71932] transition-colors line-clamp-1">
+                <div className="p-5">
+                  <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300 line-clamp-1">
                     <Link href={`/posts/${post.slug}`}>
                       <span className="absolute inset-0" />
                       {post.title}
@@ -209,36 +208,31 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 5. Live Support & Community Call-To-Action Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="relative rounded-3xl border border-[#D71932]/30 bg-gradient-to-r from-[#171719] via-[#101012] to-[#171719] p-8 sm:p-12 overflow-hidden shadow-2xl">
-          <div
-            className="absolute top-0 right-0 w-96 h-96 bg-[#D71932]/15 blur-[100px] rounded-full pointer-events-none"
-            aria-hidden="true"
-          />
-
-          <div className="relative z-10 max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#D71932]/15 border border-[#D71932]/30 px-3 py-1 text-xs font-bold text-[#D71932] uppercase">
+      {/* 5. Live Support CTA Banner (Fluid Full-Width) */}
+      <section className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pb-20">
+        <div className="relative rounded-3xl glass-elevated p-8 sm:p-14 overflow-hidden">
+          <div className="relative z-10 max-w-2xl space-y-5">
+            <div className="inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs font-semibold text-[var(--brand-primary)]">
               <Users className="h-3.5 w-3.5" />
-              <span>Direct Gamer Support</span>
+              <span>Direct Support</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase text-[#F7F7F8] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl xl:text-5xl font-black tracking-tight text-[var(--text-primary)] leading-tight">
               Need Help or Tournament Inquiries?
             </h2>
-            <p className="text-sm sm:text-base text-[#A5A5AD] leading-relaxed">
-              Connect directly with our staff via authenticated live chat or submit a guest inquiry. We are here to support every warrior.
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+              Connect directly with our staff via authenticated live chat or submit a guest inquiry. We are here to support every player.
             </p>
-            <div className="pt-2 flex flex-wrap gap-4">
+            <div className="pt-2 flex flex-wrap gap-3">
               <Link
                 href="/chat"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#D71932] px-6 py-3 text-sm font-bold text-white shadow-[0_0_20px_rgba(215,25,50,0.4)] hover:bg-[#b01328] transition-all"
+                className="btn-primary inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white"
               >
                 <MessageSquare className="h-4 w-4" />
                 <span>Open Live Chat</span>
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.12] bg-[#080809] px-6 py-3 text-sm font-bold text-[#F7F7F8] hover:border-[#D71932]/40 transition-colors"
+                className="btn-ghost inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-[var(--text-primary)]"
               >
                 <span>Submit Guest Ticket</span>
               </Link>

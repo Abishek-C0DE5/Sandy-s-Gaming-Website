@@ -77,7 +77,6 @@ function VerifyOtpContent() {
 
       setSuccessMsg('Verification successful! Resolving your account...');
 
-      // Query database profile to check role and account status
       const { data: profile } = await supabase
         .from('profiles')
         .select('role, account_status')
@@ -146,31 +145,31 @@ function VerifyOtpContent() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-neutral-200 bg-white p-8 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="w-full max-w-md space-y-8 rounded-3xl glass-elevated p-8">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-            <KeyRound className="h-6 w-6" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl glass text-[var(--brand-primary)] animate-float">
+            <KeyRound className="h-7 w-7" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="mt-4 text-2xl font-black tracking-tight text-white">
             Enter Verification Code
           </h1>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
             We sent a 6-digit passcode to <br />
-            <strong className="text-neutral-900 dark:text-white">
+            <strong className="text-white">
               {target || (channel === 'phone' ? 'your phone' : 'your email')}
             </strong>
           </p>
         </div>
 
         {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-400">
+          <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-sm text-red-400">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
+          <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 text-sm text-emerald-400">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             <span>{successMsg}</span>
           </div>
@@ -178,8 +177,8 @@ function VerifyOtpContent() {
 
         <form onSubmit={handleVerifyOtp} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="token" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              6-Digit Code
+            <label htmlFor="token" className="block text-xs font-semibold text-[var(--text-secondary)] text-center mb-2">
+              Enter 6-Digit Passcode
             </label>
             <input
               id="token"
@@ -189,17 +188,18 @@ function VerifyOtpContent() {
               pattern="[0-9]*"
               maxLength={8}
               required
+              autoFocus
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder="123456"
-              className="mt-1 block w-full tracking-widest text-center text-2xl font-mono rounded-lg border border-neutral-300 bg-white py-3 text-neutral-900 placeholder:text-neutral-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+              placeholder="••••••"
+              className="block w-full tracking-[0.4em] text-center text-3xl font-mono rounded-2xl border border-white/[0.08] bg-[var(--surface-secondary)] py-4 text-white placeholder:text-[var(--text-muted)] focus:border-[var(--brand-primary)]/50 focus:ring-1 focus:ring-[var(--brand-primary)]/30 focus:outline-none transition-all duration-300"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 disabled:opacity-50 transition-colors"
+            className="btn-primary flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white disabled:opacity-50 transition-all duration-300"
           >
             {loading ? (
               <>
@@ -215,10 +215,10 @@ function VerifyOtpContent() {
           </button>
         </form>
 
-        <div className="flex items-center justify-between border-t border-neutral-200 pt-6 text-xs dark:border-neutral-800">
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-6 text-xs">
           <Link
             href="/login"
-            className="flex items-center gap-1 font-medium text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+            className="flex items-center gap-1.5 font-semibold text-[var(--text-muted)] hover:text-white transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Change {channel === 'phone' ? 'Phone' : 'Email'}</span>
@@ -228,10 +228,10 @@ function VerifyOtpContent() {
             type="button"
             onClick={handleResendOtp}
             disabled={resendCooldown > 0 || resending}
-            className="flex items-center gap-1 font-medium text-blue-600 hover:text-blue-500 disabled:text-neutral-400 dark:text-blue-400 dark:disabled:text-neutral-600"
+            className="flex items-center gap-1.5 font-semibold text-[var(--brand-primary)] hover:underline disabled:text-[var(--text-muted)] disabled:no-underline transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${resending ? 'animate-spin' : ''}`} />
-            <span>{resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}</span>
+            <span>{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}</span>
           </button>
         </div>
       </div>
@@ -241,7 +241,13 @@ function VerifyOtpContent() {
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="h-8 w-8 rounded-full border-2 border-[var(--brand-primary)]/20 border-t-[var(--brand-primary)] animate-spin" />
+        </div>
+      }
+    >
       <VerifyOtpContent />
     </Suspense>
   );

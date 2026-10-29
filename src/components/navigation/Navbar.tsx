@@ -2,18 +2,38 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { UserRole } from '@/types/database';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { MessageSquare, BookOpen, Image as ImageIcon, Mail, Shield, Menu, X, LogOut, User, LogIn } from 'lucide-react';
+
+const NAV_LINKS = [
+  { href: '/blog', label: 'Blogs', icon: BookOpen },
+  { href: '/posts', label: 'Gallery', icon: ImageIcon },
+  { href: '/contact', label: 'Contact', icon: Mail },
+] as const;
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Detect scroll for glass effect
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -77,75 +97,86 @@ export function Navbar() {
     router.refresh();
   };
 
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+
+  const chatHref = userRole === 'admin' || userRole === 'super_admin' ? '/admin/conversations' : '/chat';
+  const chatLabel = userRole === 'admin' || userRole === 'super_admin' ? 'Admin Inbox' : 'Live Chat';
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#080809]/95 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Official Brand Logo */}
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-500 ${
+        scrolled
+          ? 'bg-[var(--background)]/90 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
+          : 'bg-transparent border-b border-transparent'
+      }`}
+    >
+      <div className="w-full flex h-16 max-w-[1720px] mx-auto items-center justify-between px-4 sm:px-8 lg:px-12 xl:px-16">
+        {/* Brand Logo */}
         <div className="flex items-center gap-3">
-          <BrandLogo size="md" withText={true} href="/" glow={true} />
+          <BrandLogo size="md" withText={true} href="/" glow={false} />
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-bold text-[#A5A5AD]">
+        <nav className="hidden md:flex items-center gap-1">
+          {NAV_LINKS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                isActive(href)
+                  ? 'text-white bg-white/[0.06]'
+                  : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              <Icon className={`h-4 w-4 transition-colors ${isActive(href) ? 'text-[var(--brand-primary)]' : ''}`} />
+              <span>{label}</span>
+              {isActive(href) && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[var(--brand-primary)]" />
+              )}
+            </Link>
+          ))}
           <Link
-            href="/blog"
-            className="flex items-center gap-1.5 hover:text-white hover:text-[#D71932] transition-colors"
+            href={chatHref}
+            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+              isActive('/chat') || isActive('/admin/conversations')
+                ? 'text-white bg-white/[0.06]'
+                : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+            }`}
           >
-            <BookOpen className="h-4 w-4 text-[#D71932]" />
-            <span>Blogs</span>
-          </Link>
-          <Link
-            href="/posts"
-            className="flex items-center gap-1.5 hover:text-white hover:text-[#D71932] transition-colors"
-          >
-            <ImageIcon className="h-4 w-4 text-[#D71932]" />
-            <span>Gallery</span>
-          </Link>
-          <Link
-            href="/contact"
-            className="flex items-center gap-1.5 hover:text-white hover:text-[#D71932] transition-colors"
-          >
-            <Mail className="h-4 w-4 text-[#D71932]" />
-            <span>Contact Us</span>
-          </Link>
-          <Link
-            href={userRole === 'admin' || userRole === 'super_admin' ? '/admin/conversations' : '/chat'}
-            className="flex items-center gap-1.5 hover:text-white hover:text-[#D71932] transition-colors"
-          >
-            <MessageSquare className="h-4 w-4 text-[#D71932]" />
-            <span>{userRole === 'admin' || userRole === 'super_admin' ? 'Admin Inbox' : 'Live Chat'}</span>
+            <MessageSquare className={`h-4 w-4 transition-colors ${isActive('/chat') || isActive('/admin/conversations') ? 'text-[var(--brand-primary)]' : ''}`} />
+            <span>{chatLabel}</span>
           </Link>
         </nav>
 
         {/* Action Controls */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2.5">
           {!loading && userEmail ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {(userRole === 'admin' || userRole === 'super_admin') && (
                 <>
                   <Link
                     href="/admin/posts/new"
-                    className="flex items-center gap-1.5 rounded-lg border border-[#D71932]/50 bg-[#171719] px-3 py-1.5 text-xs font-bold text-[#F7F7F8] hover:border-[#D71932] hover:bg-[#D71932]/10 transition-colors"
+                    className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-300"
                   >
                     <span>+ Post</span>
                   </Link>
                   <Link
                     href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
-                    className="flex items-center gap-1.5 rounded-lg bg-[#D71932] px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_15px_rgba(215,25,50,0.4)] hover:bg-[#b01328] transition-colors"
+                    className="btn-primary flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-white"
                   >
                     <Shield className="h-3.5 w-3.5" />
                     <span>{userRole === 'super_admin' ? 'Super Admin' : 'Admin'}</span>
                   </Link>
                 </>
               )}
-              <div className="flex items-center gap-1.5 text-xs text-[#A5A5AD] bg-[#101012] border border-white/[0.08] rounded-lg px-2.5 py-1.5">
-                <User className="h-3.5 w-3.5 text-[#D71932]" />
+              <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] glass rounded-xl px-2.5 py-1.5">
+                <User className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
                 <span className="max-w-[120px] truncate">{userEmail}</span>
               </div>
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-1 rounded-lg border border-red-950/60 bg-red-950/20 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-950/40 hover:text-red-300 transition-colors"
+                className="flex items-center gap-1.5 rounded-xl border border-red-900/30 bg-red-950/10 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-950/20 hover:border-red-900/50 transition-all duration-300"
                 title="Sign Out"
               >
                 <LogOut className="h-3.5 w-3.5" />
@@ -153,23 +184,23 @@ export function Navbar() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 rounded-lg border border-white/[0.12] bg-[#101012] px-3 py-1.5 text-xs font-semibold text-[#F7F7F8] hover:border-[#D71932]/50 hover:bg-[#171719] transition-colors"
+                className="btn-ghost flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-[var(--text-primary)]"
               >
-                <LogIn className="h-3.5 w-3.5 text-[#D71932]" />
+                <LogIn className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
                 <span>Sign In</span>
               </Link>
               <Link
                 href="/register"
-                className="flex items-center gap-1.5 rounded-lg border border-[#D71932]/40 bg-[#171719] px-3 py-1.5 text-xs font-bold text-[#F7F7F8] hover:border-[#D71932] transition-colors"
+                className="btn-ghost flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-[var(--text-primary)]"
               >
                 <span>Register</span>
               </Link>
               <Link
                 href="/admin"
-                className="flex items-center gap-1.5 rounded-lg bg-[#D71932] px-3 py-1.5 text-xs font-bold text-white shadow-[0_0_15px_rgba(215,25,50,0.4)] hover:bg-[#b01328] transition-colors"
+                className="btn-primary flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-white"
               >
                 <Shield className="h-3.5 w-3.5" />
                 <span>Staff</span>
@@ -178,75 +209,72 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile controls */}
+        {/* Mobile toggle */}
         <div className="flex md:hidden items-center gap-2">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex items-center justify-center rounded-lg p-2 text-[#A5A5AD] hover:text-white hover:bg-[#171719] transition-colors"
+            className="inline-flex items-center justify-center rounded-xl p-2 text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.06] transition-all duration-300"
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu dropdown */}
-      {mobileMenuOpen && (
-        <div className="border-b border-white/[0.08] bg-[#080809] px-4 pt-3 pb-5 md:hidden">
-          <div className="flex flex-col space-y-3 text-sm font-medium">
-            <Link
-              href="/blog"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-1.5 text-[#F7F7F8] hover:text-[#D71932]"
-            >
-              <BookOpen className="h-4 w-4 text-[#D71932]" />
-              <span>Blogs</span>
-            </Link>
-            <Link
-              href="/posts"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-1.5 text-[#F7F7F8] hover:text-[#D71932]"
-            >
-              <ImageIcon className="h-4 w-4 text-[#D71932]" />
-              <span>Gallery</span>
-            </Link>
-            <Link
-              href="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-1.5 text-[#F7F7F8] hover:text-[#D71932]"
-            >
-              <Mail className="h-4 w-4 text-[#D71932]" />
-              <span>Contact Us</span>
-            </Link>
+      {/* Mobile menu — smooth slide-in */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-400 ease-out ${
+          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="border-t border-white/[0.06] bg-[var(--background)]/95 backdrop-blur-2xl px-4 pt-3 pb-5">
+          <div className="flex flex-col space-y-1">
+            {NAV_LINKS.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center gap-2.5 py-2.5 px-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                  isActive(href)
+                    ? 'text-white bg-white/[0.06]'
+                    : 'text-[var(--text-primary)] hover:bg-white/[0.04]'
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${isActive(href) ? 'text-[var(--brand-primary)]' : 'text-[var(--text-secondary)]'}`} />
+                <span>{label}</span>
+              </Link>
+            ))}
             <Link
               href="/chat"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-1.5 text-[#F7F7F8] hover:text-[#D71932]"
+              className={`flex items-center gap-2.5 py-2.5 px-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                isActive('/chat')
+                  ? 'text-white bg-white/[0.06]'
+                  : 'text-[var(--text-primary)] hover:bg-white/[0.04]'
+              }`}
             >
-              <MessageSquare className="h-4 w-4 text-[#D71932]" />
+              <MessageSquare className={`h-4 w-4 ${isActive('/chat') ? 'text-[var(--brand-primary)]' : 'text-[var(--text-secondary)]'}`} />
               <span>Live Chat</span>
             </Link>
-            <div className="pt-3 border-t border-white/[0.08] flex flex-col gap-2">
+
+            <div className="pt-3 mt-2 border-t border-white/[0.06] flex flex-col gap-2">
               {!loading && userEmail ? (
                 <>
-                  <div className="text-xs text-[#A5A5AD] py-1 font-mono">
-                    Signed in: {userEmail} ({userRole})
+                  <div className="text-xs text-[var(--text-secondary)] py-1.5 px-3 font-mono">
+                    {userEmail}
+                    <span className="ml-1.5 text-[var(--text-muted)]">({userRole})</span>
                   </div>
                   {(userRole === 'admin' || userRole === 'super_admin') && (
                     <>
                       <Link
                         href="/admin/posts/new"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-full text-center rounded-lg border border-[#D71932]/50 bg-[#171719] py-2 text-sm font-bold text-[#F7F7F8] hover:border-[#D71932]"
+                        className="w-full text-center rounded-xl btn-ghost py-2.5 text-sm font-semibold text-[var(--text-primary)]"
                       >
                         + Create New Post
                       </Link>
                       <Link
                         href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-full text-center rounded-lg bg-[#D71932] py-2 text-sm font-bold text-white shadow-xs"
+                        className="w-full text-center rounded-xl btn-primary py-2.5 text-sm font-semibold text-white"
                       >
                         Staff Dashboard
                       </Link>
@@ -254,11 +282,8 @@ export function Navbar() {
                   )}
                   <button
                     type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleSignOut();
-                    }}
-                    className="w-full text-center rounded-lg border border-red-900/60 bg-red-950/20 py-2 text-sm font-medium text-red-400"
+                    onClick={handleSignOut}
+                    className="w-full text-center rounded-xl border border-red-900/30 bg-red-950/10 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/20 transition-colors"
                   >
                     Sign Out
                   </button>
@@ -267,15 +292,13 @@ export function Navbar() {
                 <>
                   <Link
                     href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center rounded-lg border border-white/[0.12] bg-[#101012] py-2 text-sm font-semibold text-[#F7F7F8]"
+                    className="w-full text-center rounded-xl btn-ghost py-2.5 text-sm font-semibold text-[var(--text-primary)]"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center rounded-lg bg-[#D71932] py-2 text-sm font-bold text-white"
+                    className="w-full text-center rounded-xl btn-primary py-2.5 text-sm font-semibold text-white"
                   >
                     Staff Portal
                   </Link>
@@ -284,7 +307,7 @@ export function Navbar() {
             </div>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
