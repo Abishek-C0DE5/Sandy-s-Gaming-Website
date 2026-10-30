@@ -31,21 +31,22 @@ export function BrandLogo({
     <div className={`inline-flex items-center gap-2.5 select-none group ${className}`}>
       <div className="relative flex items-center justify-center shrink-0">
         <Image
-          src="/brand/sandys-gaming-logo.webp"
+          src="/brand/sandys-gaming-logo.png"
           alt="SANDY'S GAMING"
           width={config.width}
           height={config.height}
           priority={size === 'hero' || size === 'md'}
-          className="relative z-10 object-contain transition-transform duration-500 ease-out group-hover:scale-105"
+          quality={95}
+          className="relative z-10 object-contain transition-transform duration-300 ease-out group-hover:scale-105 drop-shadow-sm"
         />
       </div>
 
       {withText && (
         <div className="flex flex-col leading-none">
-          <span className={`font-black tracking-wide text-[var(--text-primary)] uppercase ${config.text}`}>
+          <span className={`font-black tracking-tight text-white uppercase ${config.text}`}>
             SANDY&apos;S
           </span>
-          <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--brand-primary)] uppercase">
+          <span className="text-[10px] font-extrabold tracking-[0.25em] text-[var(--brand-highlight)] uppercase mt-0.5">
             GAMING
           </span>
         </div>

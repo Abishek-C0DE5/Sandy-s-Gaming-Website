@@ -4,20 +4,20 @@ import { Shield, Sparkles, MessageSquare, BookOpen, ImageIcon, Mail } from 'luci
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] bg-[var(--background)]">
+    <footer className="border-t border-white/[0.08] bg-[#06070A]">
       <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-14 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
             <BrandLogo size="md" withText={true} href="/" glow={false} />
-            <p className="max-w-md text-sm text-[var(--text-secondary)] leading-relaxed">
-              Sandy&apos;s Gaming is an esports and gaming entertainment hub. Delivering exclusive articles, artwork galleries, and competitive tournament coverage with dedicated 24/7 staff support.
+            <p className="max-w-md text-sm text-slate-400 leading-relaxed">
+              Sandy&apos;s Gaming is an esports and gaming entertainment hub. Delivering exclusive tournament analysis, patch meta guides, digital artwork, and direct 24/7 staff live support.
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-xs font-semibold tracking-wide text-[var(--text-primary)]">
+            <h3 className="text-xs font-bold tracking-wider uppercase text-white">
               Navigation
             </h3>
             <ul className="space-y-2.5 text-sm">
@@ -28,8 +28,8 @@ export function Footer() {
                 { href: '/chat', label: 'Live Chat', icon: MessageSquare },
               ].map(({ href, label, icon: Icon }) => (
                 <li key={href}>
-                  <Link href={href} className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
-                    <Icon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                  <Link href={href} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200">
+                    <Icon className="h-3.5 w-3.5 text-slate-500" />
                     <span>{label}</span>
                   </Link>
                 </li>
@@ -39,24 +39,24 @@ export function Footer() {
 
           {/* Staff Access */}
           <div className="space-y-4">
-            <h3 className="text-xs font-semibold tracking-wide text-[var(--text-primary)]">
+            <h3 className="text-xs font-bold tracking-wider uppercase text-white">
               Staff &amp; Operations
             </h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/login" className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
+                <Link href="/login" className="text-slate-400 hover:text-white transition-colors duration-200">
                   Sign In
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
-                  <Shield className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                <Link href="/admin" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200">
+                  <Shield className="h-3.5 w-3.5 text-slate-500" />
                   <span>Staff Workspace</span>
                 </Link>
               </li>
               <li>
-                <Link href="/super-admin" className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors duration-300">
-                  <Sparkles className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                <Link href="/super-admin" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200">
+                  <Sparkles className="h-3.5 w-3.5 text-slate-500" />
                   <span>Super Admin</span>
                 </Link>
               </li>
@@ -64,9 +64,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--text-muted)] gap-4">
+        <div className="mt-14 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>&copy; 2026 Sandy&apos;s Gaming. All rights reserved.</p>
-          <p className="font-mono text-[11px]">Built for competitive performance</p>
+          <p className="font-mono text-[11px] text-slate-600">Built for competitive esports performance</p>
         </div>
       </div>
     </footer>

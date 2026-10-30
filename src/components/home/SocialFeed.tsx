@@ -151,19 +151,19 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
   return (
     <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
       {/* Feed Controls Header */}
-      <div className="mb-6 border-b border-white/[0.06] pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="mb-6 border-b border-white/[0.08] pb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
-            <Flame className="h-4 w-4" />
+          <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--brand-highlight)]">
+            <Flame className="h-3.5 w-3.5" />
             <span>Community &amp; Esports Feed</span>
           </div>
-          <h2 className="text-xl sm:text-2xl xl:text-3xl font-black tracking-tight text-white mt-1">
-            Sandy&apos;s Live Stream
+          <h2 className="text-xl sm:text-2xl xl:text-3xl font-black tracking-tight text-white mt-2">
+            Sandy&apos;s Community Stream
           </h2>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl glass text-xs font-semibold">
+        {/* Filter Tabs (Refined Segmented Control) */}
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[#0B0D14] border border-white/[0.08] text-xs font-semibold">
           {filters.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -172,10 +172,10 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
                 setFilter(key);
                 setVisibleCount(BATCH_SIZE);
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-300 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors duration-200 ${
                 filter === key
-                  ? 'btn-primary text-white'
-                  : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-[#1A1F2C] text-white border border-white/[0.1] shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               {Icon && <Icon className="h-3 w-3" />}
@@ -193,7 +193,7 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
           return (
             <article
               key={post.id}
-              className="rounded-2xl glass-elevated overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-white/[0.14] hover:shadow-xl hover:-translate-y-0.5 group"
+              className="gaming-card overflow-hidden flex flex-col justify-between group"
               style={{ animationDelay: `${index * 0.04}s` }}
             >
               {/* Top Media Container with Integrated Badges */}
@@ -212,24 +212,24 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--surface-secondary)] to-[var(--background)]">
                     {post.post_type === 'blog' ? (
-                      <BookOpen className="h-9 w-9 text-[var(--brand-primary)] opacity-30" />
+                      <BookOpen className="h-9 w-9 text-[var(--brand-highlight)] opacity-30" />
                     ) : (
-                      <ImageIcon className="h-9 w-9 text-[var(--brand-primary)] opacity-30" />
+                      <ImageIcon className="h-9 w-9 text-[var(--brand-highlight)] opacity-30" />
                     )}
                   </div>
                 )}
 
                 {/* Sleek Frosted Type Badge */}
                 <div className="absolute top-2.5 left-2.5">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full glass text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-wider text-white">
                     {post.post_type === 'blog' ? (
                       <>
-                        <BookOpen className="h-2.5 w-2.5 text-[var(--brand-primary)]" />
+                        <BookOpen className="h-2.5 w-2.5 text-[var(--brand-highlight)]" />
                         <span>Article</span>
                       </>
                     ) : (
                       <>
-                        <ImageIcon className="h-2.5 w-2.5 text-[var(--brand-primary)]" />
+                        <ImageIcon className="h-2.5 w-2.5 text-[var(--brand-highlight)]" />
                         <span>Artwork</span>
                       </>
                     )}
@@ -240,7 +240,7 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
                 <div className="absolute top-2.5 right-2.5">
                   <span
                     suppressHydrationWarning
-                    className="inline-flex items-center px-2 py-0.5 rounded-full glass text-[10px] font-mono text-[var(--text-secondary)] backdrop-blur-md"
+                    className="inline-flex items-center px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300"
                   >
                     {formatTimestamp(post.published_at)}
                   </span>
@@ -251,39 +251,40 @@ export function SocialFeed({ initialPosts = [] }: { initialPosts?: FeedPost[] })
               <div className="p-4 sm:p-4.5 flex-1 flex flex-col justify-between space-y-3">
                 <div className="space-y-1.5">
                   <Link href={detailUrl} className="block group/title">
-                    <h3 className="text-sm sm:text-base font-bold text-white group-hover/title:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-2 leading-snug">
+                    <h3 className="text-sm sm:text-base font-bold text-white group-hover/title:text-[var(--brand-highlight)] transition-colors duration-200 line-clamp-2 leading-snug">
                       {post.title}
                     </h3>
                   </Link>
 
                   {post.excerpt && (
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
                       {post.excerpt}
                     </p>
                   )}
                 </div>
 
                 {/* Compact Action Footer */}
-                <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
+                <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="relative h-5 w-5 rounded-full overflow-hidden bg-[var(--surface-secondary)] shrink-0">
                       <Image
-                        src="/brand/sandys-gaming-logo.webp"
+                        src="/brand/sandys-gaming-logo.png"
                         alt="Sandy's Gaming"
                         width={20}
                         height={20}
+                        unoptimized={true}
                         className="object-cover"
                       />
                     </div>
-                    <span className="text-[11px] font-medium text-[var(--text-muted)]">
+                    <span className="text-[11px] font-semibold text-slate-300">
                       Sandy&apos;s HQ
                     </span>
-                    <ShieldCheck className="h-3 w-3 text-[var(--brand-primary)]" />
+                    <ShieldCheck className="h-3 w-3 text-[var(--brand-highlight)]" />
                   </div>
 
                   <Link
                     href={detailUrl}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] hover:text-white transition-colors group/link"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-highlight)] hover:text-white transition-colors group/link"
                   >
                     <span>{post.post_type === 'blog' ? 'Read' : 'View'}</span>
                     <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover/link:translate-x-0.5" />

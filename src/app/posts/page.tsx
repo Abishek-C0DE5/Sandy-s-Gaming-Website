@@ -48,22 +48,22 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
   return (
     <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
       {/* Gallery Header */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.06] pb-8 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.08] pb-6 gap-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
-            <Flame className="h-4 w-4" />
+          <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--brand-highlight)]">
+            <Flame className="h-3.5 w-3.5" />
             <span>Official Artwork &amp; Media</span>
           </div>
-          <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[var(--text-primary)]">
+          <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
             Visual Media &amp; Posters
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
             Curated high-res esports wallpapers, custom digital posters, and creative assets released by Sandy&apos;s Gaming.
           </p>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 rounded-2xl glass p-1 self-start md:self-auto">
+        <div className="flex items-center gap-1 rounded-xl bg-[#0B0D14] border border-white/[0.08] p-1 self-start md:self-auto">
           {[
             { key: 'all', label: 'All Media', href: '/posts' },
             { key: 'poster', label: 'Posters', href: '/posts?type=poster' },
@@ -72,10 +72,10 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
             <Link
               key={key}
               href={href}
-              className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 ${
+              className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                 activeFilter === key
-                  ? 'btn-primary text-white'
-                  : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-[#1A1F2C] text-white border border-white/[0.1] shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               {label}
@@ -85,7 +85,7 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
       </div>
 
       {/* Gallery Grid */}
-      <div className="mt-10">
+      <div className="mt-8">
         {error ? (
           <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-sm text-red-400">
             Failed to load gallery items from database. Please refresh or try again later.
@@ -111,7 +111,7 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
             {galleryItems.map((item) => (
               <article
                 key={item.id}
-                className="rounded-2xl glass-elevated overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-white/[0.14] hover:shadow-xl hover:-translate-y-0.5 group"
+                className="gaming-card overflow-hidden flex flex-col justify-between group"
               >
                 <Link
                   href={`/posts/${encodeURIComponent(item.slug)}`}
@@ -127,12 +127,12 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--surface-secondary)] to-[var(--background)]">
-                      <Sparkles className="h-9 w-9 text-[var(--brand-primary)] opacity-30" />
+                      <Sparkles className="h-9 w-9 text-[var(--brand-highlight)] opacity-30" />
                     </div>
                   )}
                   <div className="absolute top-2.5 left-2.5">
-                    <span className="inline-flex items-center gap-1 rounded-full glass px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md">
-                      <Layers className="h-2.5 w-2.5 text-[var(--brand-primary)]" />
+                    <span className="inline-flex items-center gap-1 rounded-md bg-black/75 backdrop-blur-md border border-white/10 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                      <Layers className="h-2.5 w-2.5 text-[var(--brand-highlight)]" />
                       <span>{item.post_type}</span>
                     </span>
                   </div>
@@ -140,23 +140,23 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
 
                 <div className="p-4 sm:p-4.5 flex-1 flex flex-col justify-between space-y-3">
                   <div className="space-y-1.5">
-                    <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-2 leading-snug">
+                    <h2 className="text-sm sm:text-base font-bold text-white group-hover:text-[var(--brand-highlight)] transition-colors duration-200 line-clamp-2 leading-snug">
                       <Link href={`/posts/${encodeURIComponent(item.slug)}`}>
                         {item.title}
                       </Link>
                     </h2>
                     {item.excerpt && (
-                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
                         {item.excerpt}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
-                    <span className="text-[11px] text-[var(--text-muted)]">Sandy&apos;s Studio</span>
+                  <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-slate-400">Sandy&apos;s Studio</span>
                     <Link
                       href={`/posts/${encodeURIComponent(item.slug)}`}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] group-hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-highlight)] group-hover:text-white transition-colors"
                     >
                       <span>View</span>
                       <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />

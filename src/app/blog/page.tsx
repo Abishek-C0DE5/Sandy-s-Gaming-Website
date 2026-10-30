@@ -58,23 +58,23 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   return (
     <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.06] pb-8 gap-6">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.08] pb-6 gap-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
-            <Flame className="h-4 w-4" />
+          <div className="inline-flex items-center gap-2 rounded-md bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 text-[11px] font-bold tracking-[0.15em] uppercase text-[var(--brand-highlight)]">
+            <Flame className="h-3.5 w-3.5" />
             <span>Sandy&apos;s Editorial &amp; Esports Feed</span>
           </div>
-          <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[var(--text-primary)]">
+          <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
             Latest Publications
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
             In-depth guides on competitive gaming, esports rosters, and platform updates curated by Sandy&apos;s Gaming.
           </p>
         </div>
 
         {/* Search Input Bar */}
         <form method="get" action="/blog" className="relative w-full max-w-xs">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--text-muted)]">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
             <Search className="h-4 w-4" />
           </div>
           <input
@@ -82,13 +82,13 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
             name="q"
             defaultValue={q || ''}
             placeholder="Search articles..."
-            className="block w-full rounded-xl border border-white/[0.08] bg-[var(--surface-secondary)] py-2.5 pr-3 pl-10 text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--brand-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)]/30 transition-all duration-300"
+            className="block w-full rounded-xl border border-white/[0.08] bg-[#0E1118] py-2.5 pr-3 pl-10 text-xs text-white placeholder:text-slate-500 focus:border-[var(--brand-highlight)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--brand-highlight)]/30 transition-colors"
           />
         </form>
       </div>
 
       {/* Content Feed */}
-      <div className="mt-10">
+      <div className="mt-8">
         {error ? (
           <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-6 text-sm text-red-400">
             Failed to load articles from database. Please refresh or try again later.
@@ -127,7 +127,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
               return (
                 <article
                   key={post.id}
-                  className="rounded-2xl glass-elevated overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-white/[0.14] hover:shadow-xl hover:-translate-y-0.5 group"
+                  className="gaming-card overflow-hidden flex flex-col justify-between group"
                 >
                   <Link
                     href={`/blog/${encodeURIComponent(post.slug)}`}
@@ -143,42 +143,42 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--surface-secondary)] to-[var(--background)]">
-                        <BookOpen className="h-9 w-9 text-[var(--brand-primary)] opacity-30" />
+                        <BookOpen className="h-9 w-9 text-[var(--brand-highlight)] opacity-30" />
                       </div>
                     )}
-                    <div className="absolute top-2.5 left-2.5 rounded-full glass px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md">
+                    <div className="absolute top-2.5 left-2.5 rounded-md bg-black/75 backdrop-blur-md border border-white/10 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
                       Article
                     </div>
-                    <div className="absolute top-2.5 right-2.5 rounded-full glass px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] backdrop-blur-md">
+                    <div className="absolute top-2.5 right-2.5 rounded-md bg-black/75 backdrop-blur-md border border-white/10 px-2 py-0.5 text-[10px] font-mono text-slate-300">
                       {formattedDate}
                     </div>
                   </Link>
 
                   <div className="p-4 sm:p-4.5 flex-1 flex flex-col justify-between space-y-3">
                     <div className="space-y-1.5">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)] font-mono">
-                        <Clock className="h-3 w-3 text-[var(--brand-primary)]" />
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
+                        <Clock className="h-3 w-3 text-[var(--brand-highlight)]" />
                         <span>4 min read</span>
                       </div>
 
-                      <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-2 leading-snug">
+                      <h2 className="text-sm sm:text-base font-bold text-white group-hover:text-[var(--brand-highlight)] transition-colors duration-200 line-clamp-2 leading-snug">
                         <Link href={`/blog/${encodeURIComponent(post.slug)}`}>
                           {post.title}
                         </Link>
                       </h2>
 
                       {post.excerpt && (
-                        <p className="text-xs leading-relaxed text-[var(--text-secondary)] line-clamp-2">
+                        <p className="text-xs leading-relaxed text-slate-400 line-clamp-2">
                           {post.excerpt}
                         </p>
                       )}
                     </div>
 
-                    <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
-                      <span className="text-[11px] text-[var(--text-muted)]">Sandy&apos;s Editorial</span>
+                    <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-slate-400">Sandy&apos;s Editorial</span>
                       <Link
                         href={`/blog/${encodeURIComponent(post.slug)}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] group-hover:text-white transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-highlight)] group-hover:text-white transition-colors"
                       >
                         <span>Read</span>
                         <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />

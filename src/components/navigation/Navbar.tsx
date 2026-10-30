@@ -104,9 +104,9 @@ export function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-500 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
-          ? 'bg-[var(--background)]/90 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
+          ? 'bg-[#090A0F]/95 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.5)]'
           : 'bg-transparent border-b border-transparent'
       }`}
     >
@@ -117,33 +117,33 @@ export function Navbar() {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1.5">
           {NAV_LINKS.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
-              className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+              className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive(href)
-                  ? 'text-white bg-white/[0.06]'
-                  : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+                  ? 'text-white bg-white/[0.08]'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <Icon className={`h-4 w-4 transition-colors ${isActive(href) ? 'text-[var(--brand-primary)]' : ''}`} />
+              <Icon className={`h-4 w-4 transition-colors ${isActive(href) ? 'text-[var(--brand-highlight)]' : 'text-slate-400'}`} />
               <span>{label}</span>
               {isActive(href) && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[var(--brand-primary)]" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-[var(--brand-highlight)]" />
               )}
             </Link>
           ))}
           <Link
             href={chatHref}
-            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               isActive('/chat') || isActive('/admin/conversations')
-                ? 'text-white bg-white/[0.06]'
-                : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
+                ? 'text-white bg-white/[0.08]'
+                : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'
             }`}
           >
-            <MessageSquare className={`h-4 w-4 transition-colors ${isActive('/chat') || isActive('/admin/conversations') ? 'text-[var(--brand-primary)]' : ''}`} />
+            <MessageSquare className={`h-4 w-4 transition-colors ${isActive('/chat') || isActive('/admin/conversations') ? 'text-[var(--brand-highlight)]' : 'text-slate-400'}`} />
             <span>{chatLabel}</span>
           </Link>
         </nav>
@@ -156,27 +156,27 @@ export function Navbar() {
                 <>
                   <Link
                     href="/admin/posts/new"
-                    className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-300"
+                    className="flex items-center gap-1.5 rounded-lg border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/[0.08] transition-colors"
                   >
                     <span>+ Post</span>
                   </Link>
                   <Link
                     href={userRole === 'super_admin' ? '/super-admin' : '/admin'}
-                    className="btn-primary flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-white"
+                    className="btn-primary flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white"
                   >
                     <Shield className="h-3.5 w-3.5" />
                     <span>{userRole === 'super_admin' ? 'Super Admin' : 'Admin'}</span>
                   </Link>
                 </>
               )}
-              <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] glass rounded-xl px-2.5 py-1.5">
-                <User className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
+              <div className="flex items-center gap-1.5 text-xs text-slate-300 bg-white/[0.04] border border-white/[0.08] rounded-lg px-2.5 py-1.5">
+                <User className="h-3.5 w-3.5 text-[var(--brand-highlight)]" />
                 <span className="max-w-[120px] truncate">{userEmail}</span>
               </div>
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-1.5 rounded-xl border border-red-900/30 bg-red-950/10 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-950/20 hover:border-red-900/50 transition-all duration-300"
+                className="flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-950/20 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-950/40 hover:border-red-500/40 transition-colors"
                 title="Sign Out"
               >
                 <LogOut className="h-3.5 w-3.5" />
@@ -187,20 +187,20 @@ export function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="btn-ghost flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-[var(--text-primary)]"
+                className="btn-ghost flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold"
               >
-                <LogIn className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
+                <LogIn className="h-3.5 w-3.5 text-[var(--brand-highlight)]" />
                 <span>Sign In</span>
               </Link>
               <Link
                 href="/register"
-                className="btn-ghost flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-[var(--text-primary)]"
+                className="btn-ghost flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold"
               >
                 <span>Register</span>
               </Link>
               <Link
                 href="/admin"
-                className="btn-primary flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold text-white"
+                className="btn-primary flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold text-white"
               >
                 <Shield className="h-3.5 w-3.5" />
                 <span>Staff</span>
