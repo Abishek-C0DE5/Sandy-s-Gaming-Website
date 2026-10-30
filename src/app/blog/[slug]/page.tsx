@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { Calendar, Clock, ArrowLeft, User, MessageSquare } from 'lucide-react';
 
 interface BlogPostPageProps {
@@ -23,10 +23,10 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const { slug } = await params;
   if (!slug) return { title: 'Article Not Found' };
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: post } = await supabase
     .from('posts')
-    .select('title, excerpt, cover_image')
+    .select('title, excerpt, cover_image, published_at')
     .eq('slug', slug)
     .eq('post_type', 'blog')
     .eq('status', 'published')
@@ -40,17 +40,32 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   }
 
   const resolvedImage = resolveImageUrl(supabase, post.cover_image);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sandys-gaming.vercel.app';
 
   return {
     title: `${post.title} | Sandy's Gaming Blog`,
     description: post.excerpt || 'Read this article on Sandy\'s Gaming.',
+    alternates: {
+      canonical: `/blog/${encodeURIComponent(slug)}`,
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt || '',
+      url: `${siteUrl}/blog/${encodeURIComponent(slug)}`,
+      type: 'article',
+      publishedTime: post.published_at || undefined,
       images: resolvedImage ? [{ url: resolvedImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt || '',
+      images: resolvedImage ? [resolvedImage] : [],
     },
   };
 }
+
+export const instant = false;
 
 export default async function BlogPostDetailPage({ params }: BlogPostPageProps) {
   await connection();
@@ -61,7 +76,7 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
   }
 
   const cleanSlug = slug.trim();
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: post, error } = await supabase
     .from('posts')
@@ -84,9 +99,40 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
         year: 'numeric',
       })
     : 'Recently published';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sandys-gaming.vercel.app';
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt || post.title,
+    image: coverUrl ? [coverUrl] : undefined,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.published_at || post.created_at,
+    author: {
+      '@type': 'Organization',
+      name: "Sandy's Gaming Editorial Team",
+      url: siteUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: "Sandy's Gaming",
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/brand/sandys-gaming-logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/blog/${encodeURIComponent(post.slug)}`,
+    },
+  };
 
   return (
-    <article className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
+    <article className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       {/* Breadcrumb & Navigation */}
       <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
         <Link
@@ -142,7 +188,6 @@ export default async function BlogPostDetailPage({ params }: BlogPostPageProps) 
             priority
             sizes="(max-width: 1720px) 100vw, 1720px"
             className="object-cover"
-            unoptimized
           />
         </div>
       )}

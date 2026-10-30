@@ -1,33 +1,44 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { Image as ImageIcon, Sparkles, ArrowRight, Layers, Flame } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 export const metadata: Metadata = {
-  title: 'Visual Gallery & Posters | Sandy\'s Gaming',
-  description: 'Browse high-resolution 4K wallpapers, esports artwork posters, and creative visual assets.',
+  title: 'Visual Gallery & Posters',
+  description:
+    'Browse official high-resolution 4K wallpapers, esports artwork posters, and creative digital assets released by Sandy\'s Gaming.',
+  alternates: {
+    canonical: '/posts',
+  },
+  openGraph: {
+    title: 'Visual Gallery & Posters | Sandy\'s Gaming',
+    description:
+      'Browse official high-resolution 4K wallpapers, esports artwork posters, and creative digital assets released by Sandy\'s Gaming.',
+    type: 'website',
+  },
 };
 
 interface PostsGalleryPageProps {
   searchParams: Promise<{ type?: string }>;
 }
 
+export const instant = false;
+
 export default async function PostsGalleryPage({ searchParams }: PostsGalleryPageProps) {
   await connection();
   const { type } = await searchParams;
   const activeFilter = type === 'poster' || type === 'photo' ? type : 'all';
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const query = supabase
     .from('posts')
     .select('id, title, slug, excerpt, cover_image, post_type, published_at')
     .in('post_type', activeFilter === 'all' ? ['poster', 'photo'] : [activeFilter])
     .eq('status', 'published')
-    .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
     .limit(18);
 
@@ -35,7 +46,7 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
   const galleryItems = posts || [];
 
   return (
-    <div className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
+    <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
       {/* Gallery Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.06] pb-8 gap-6">
         <div>
@@ -43,10 +54,10 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
             <Flame className="h-4 w-4" />
             <span>Official Artwork &amp; Media</span>
           </div>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--text-primary)] sm:text-4xl">
+          <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[var(--text-primary)]">
             Visual Media &amp; Posters
           </h1>
-          <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
             Curated high-res esports wallpapers, custom digital posters, and creative assets released by Sandy&apos;s Gaming.
           </p>
         </div>
@@ -96,56 +107,63 @@ export default async function PostsGalleryPage({ searchParams }: PostsGalleryPag
             }
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4.5 sm:gap-5 lg:gap-6">
             {galleryItems.map((item) => (
-              <div
+              <article
                 key={item.id}
-                className="gaming-card group relative flex flex-col overflow-hidden"
+                className="rounded-2xl glass-elevated overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-white/[0.14] hover:shadow-xl hover:-translate-y-0.5 group"
               >
-                {item.cover_image && (
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--surface-secondary)]">
+                <Link
+                  href={`/posts/${encodeURIComponent(item.slug)}`}
+                  className="block relative aspect-[16/10] w-full bg-[var(--surface-secondary)] overflow-hidden shrink-0"
+                >
+                  {item.cover_image ? (
                     <Image
                       src={item.cover_image}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                      unoptimized
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                     />
-                    <div className="absolute top-3 left-3">
-                      <span className="inline-flex items-center gap-1 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] backdrop-blur-md uppercase tracking-wide">
-                        <Layers className="h-3 w-3 text-[var(--brand-primary)]" />
-                        <span>{item.post_type}</span>
-                      </span>
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--surface-secondary)] to-[var(--background)]">
+                      <Sparkles className="h-9 w-9 text-[var(--brand-primary)] opacity-30" />
                     </div>
+                  )}
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="inline-flex items-center gap-1 rounded-full glass px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md">
+                      <Layers className="h-2.5 w-2.5 text-[var(--brand-primary)]" />
+                      <span>{item.post_type}</span>
+                    </span>
                   </div>
-                )}
+                </Link>
 
-                <div className="flex flex-1 flex-col justify-between p-6">
-                  <div>
-                    <h2 className="text-base font-bold tracking-tight text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300">
+                <div className="p-4 sm:p-4.5 flex-1 flex flex-col justify-between space-y-3">
+                  <div className="space-y-1.5">
+                    <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-2 leading-snug">
                       <Link href={`/posts/${encodeURIComponent(item.slug)}`}>
                         {item.title}
                       </Link>
                     </h2>
                     {item.excerpt && (
-                      <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)] line-clamp-2">
+                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
                         {item.excerpt}
                       </p>
                     )}
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-white/[0.04]">
+                  <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
+                    <span className="text-[11px] text-[var(--text-muted)]">Sandy&apos;s Studio</span>
                     <Link
                       href={`/posts/${encodeURIComponent(item.slug)}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-primary)] group/link"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] group-hover:text-white transition-colors"
                     >
-                      <span>View asset &amp; details</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/link:translate-x-1" />
+                      <span>View</span>
+                      <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                     </Link>
                   </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { ArrowLeft, Calendar, Layers, Sparkles, ExternalLink } from 'lucide-react';
 
 interface PostDetailPageProps {
@@ -23,10 +23,10 @@ export async function generateMetadata({ params }: PostDetailPageProps): Promise
   const { slug } = await params;
   if (!slug) return { title: 'Asset Not Found' };
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: post } = await supabase
     .from('posts')
-    .select('title, excerpt, cover_image, post_type')
+    .select('title, excerpt, cover_image, post_type, published_at')
     .eq('slug', slug)
     .in('post_type', ['poster', 'photo'])
     .eq('status', 'published')
@@ -40,17 +40,31 @@ export async function generateMetadata({ params }: PostDetailPageProps): Promise
   }
 
   const resolvedImage = resolveImageUrl(supabase, post.cover_image);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sandys-gaming.vercel.app';
 
   return {
     title: `${post.title} | ${post.post_type.toUpperCase()} Gallery | Sandy's Gaming`,
     description: post.excerpt || `View high-resolution ${post.post_type} on Sandy\'s Gaming.`,
+    alternates: {
+      canonical: `/posts/${encodeURIComponent(slug)}`,
+    },
     openGraph: {
+      title: `${post.title} | Sandy's Gaming Gallery`,
+      description: post.excerpt || '',
+      url: `${siteUrl}/posts/${encodeURIComponent(slug)}`,
+      type: 'article',
+      images: resolvedImage ? [{ url: resolvedImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
       title: post.title,
       description: post.excerpt || '',
-      images: resolvedImage ? [{ url: resolvedImage }] : [],
+      images: resolvedImage ? [resolvedImage] : [],
     },
   };
 }
+
+export const instant = false;
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   await connection();
@@ -61,7 +75,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   }
 
   const cleanSlug = slug.trim();
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Query strictly published poster or photo post
   const { data: post, error } = await supabase
@@ -116,9 +130,35 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
         year: 'numeric',
       })
     : 'Recently published';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sandys-gaming.vercel.app';
+  const artworkJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'VisualArtwork',
+    name: post.title,
+    description: post.excerpt || post.title,
+    image: resolvedMedia.length > 0 ? resolvedMedia.map((m) => m.url) : undefined,
+    artform: post.post_type === 'poster' ? 'Digital Poster' : 'Wallpaper Artwork',
+    creator: {
+      '@type': 'Organization',
+      name: "Sandy's Gaming Creative Studio",
+      url: siteUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: "Sandy's Gaming",
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/brand/sandys-gaming-logo.png`,
+      },
+    },
+  };
 
   return (
-    <div className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
+    <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(artworkJsonLd) }}
+      />
       {/* Top Breadcrumb */}
       <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
         <Link
@@ -165,7 +205,6 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                     priority={idx === 0}
                     sizes="(max-width: 1720px) 100vw, 1720px"
                     className="object-contain sm:object-cover transition-transform duration-700 ease-out group-hover:scale-[1.01]"
-                    unoptimized
                   />
                   <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <a

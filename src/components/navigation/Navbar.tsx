@@ -110,7 +110,7 @@ export function Navbar() {
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="w-full flex h-16 max-w-[1720px] mx-auto items-center justify-between px-4 sm:px-8 lg:px-12 xl:px-16">
+      <div className="w-full flex h-16 max-w-[1920px] 2xl:max-w-none mx-auto items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
           <BrandLogo size="md" withText={true} href="/" glow={false} />

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { CinematicHeroContainer } from '@/components/home/CinematicHeroContainer';
 import { SocialFeed } from '@/components/home/SocialFeed';
 import {
@@ -14,44 +14,45 @@ import {
   Users,
 } from 'lucide-react';
 
+export const instant = false;
+
 export default async function HomePage() {
   await connection();
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
-  // Query recent feed posts (both articles and posters for the progressive feed)
-  const { data: feedPosts } = await supabase
-    .from('posts')
-    .select('id, title, slug, excerpt, body, cover_image, post_type, published_at, created_at')
-    .eq('status', 'published')
-    .lte('published_at', new Date().toISOString())
-    .order('published_at', { ascending: false })
-    .limit(18);
-
-  // Query recent published blog articles (limit 3)
-  const { data: recentBlogs } = await supabase
-    .from('posts')
-    .select('id, title, slug, excerpt, cover_image, published_at')
-    .eq('post_type', 'blog')
-    .eq('status', 'published')
-    .lte('published_at', new Date().toISOString())
-    .order('published_at', { ascending: false })
-    .limit(3);
-
-  // Query recent published gallery items (limit 3)
-  const { data: recentGallery } = await supabase
-    .from('posts')
-    .select('id, title, slug, excerpt, cover_image, post_type, published_at')
-    .in('post_type', ['poster', 'photo'])
-    .eq('status', 'published')
-    .lte('published_at', new Date().toISOString())
-    .order('published_at', { ascending: false })
-    .limit(3);
+  // Query recent feed posts, blog articles, and gallery items in parallel
+  const [
+    { data: feedPosts },
+    { data: recentBlogs },
+    { data: recentGallery },
+  ] = await Promise.all([
+    supabase
+      .from('posts')
+      .select('id, title, slug, excerpt, body, cover_image, post_type, published_at, created_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(18),
+    supabase
+      .from('posts')
+      .select('id, title, slug, excerpt, cover_image, published_at')
+      .eq('post_type', 'blog')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(3),
+    supabase
+      .from('posts')
+      .select('id, title, slug, excerpt, cover_image, post_type, published_at')
+      .in('post_type', ['poster', 'photo'])
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(3),
+  ]);
 
   const blogs = recentBlogs || [];
   const gallery = recentGallery || [];
 
   return (
-    <div className="relative isolate overflow-hidden space-y-28">
+    <div className="relative isolate overflow-hidden space-y-28" suppressHydrationWarning>
       {/* 1. Cinematic Slot-Reveal Hero Container */}
       <CinematicHeroContainer />
 
@@ -60,16 +61,16 @@ export default async function HomePage() {
         <SocialFeed initialPosts={feedPosts || []} />
       </section>
 
-      {/* 3. Featured Esports Articles Section (Fluid Full-Width) */}
+      {/* 3. Featured Esports Articles Section (Fluid Full-Desktop Width) */}
       {blogs.length > 0 && (
-        <section className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
+        <section className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.06] pb-4 gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
                 <BookOpen className="h-4 w-4" />
                 <span>Editorial Feed</span>
               </div>
-              <h2 className="mt-1 text-2xl sm:text-3xl xl:text-4xl font-black tracking-tight text-[var(--text-primary)]">
+              <h2 className="mt-1 text-xl sm:text-2xl xl:text-3xl font-black tracking-tight text-[var(--text-primary)]">
                 Recent Publications
               </h2>
             </div>
@@ -82,62 +83,68 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {blogs.map((post) => (
               <article
                 key={post.id}
-                className="gaming-card group flex flex-col overflow-hidden"
+                className="gaming-card group flex flex-col justify-between overflow-hidden"
               >
                 {/* Image without border highlights */}
-                <div className="relative aspect-video w-full overflow-hidden bg-[var(--surface-secondary)]">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--surface-secondary)]">
                   {post.cover_image ? (
                     <Image
                       src={post.cover_image}
                       alt={post.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[var(--text-muted)]">
-                      <BookOpen className="h-10 w-10 opacity-20" />
+                      <BookOpen className="h-8 w-8 opacity-20" />
                     </div>
                   )}
-                  <div className="absolute top-3 left-3 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]">
+                  <div className="absolute top-2.5 left-2.5 rounded-full glass px-2.5 py-0.5 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider backdrop-blur-md">
                     BLOG
                   </div>
                 </div>
 
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] font-mono">
-                    <Calendar className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
-                    <time dateTime={post.published_at || ''}>
-                      {post.published_at
-                        ? new Date(post.published_at).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })
-                        : 'Published'}
-                    </time>
+                <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 space-y-3">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] font-mono">
+                      <Calendar className="h-3 w-3 text-[var(--brand-primary)]" />
+                      <time dateTime={post.published_at || ''}>
+                        {post.published_at
+                          ? new Date(post.published_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })
+                          : 'Published'}
+                      </time>
+                    </div>
+
+                    <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-2 leading-snug">
+                      <Link href={`/blog/${post.slug}`}>
+                        {post.title}
+                      </Link>
+                    </h3>
+
+                    {post.excerpt && (
+                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                    )}
                   </div>
 
-                  <h3 className="mt-2.5 text-base sm:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300 line-clamp-2">
-                    <Link href={`/blog/${post.slug}`}>
-                      <span className="absolute inset-0" />
-                      {post.title}
+                  <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] group-hover:text-white transition-colors"
+                    >
+                      <span>Read Article</span>
+                      <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-1" />
                     </Link>
-                  </h3>
-
-                  {post.excerpt && (
-                    <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                  )}
-
-                  <div className="mt-auto pt-4 flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-primary)]">
-                    <span>Read Article</span>
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
                 </div>
               </article>
@@ -146,16 +153,16 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 4. Posters & Visual Media Showcase (Fluid Full-Width) */}
+      {/* 4. Posters & Visual Media Showcase (Fluid Full-Desktop Width) */}
       {gallery.length > 0 && (
-        <section className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
+        <section className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/[0.06] pb-4 gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-[var(--brand-primary)]">
                 <Flame className="h-4 w-4" />
                 <span>Gallery &amp; Artwork</span>
               </div>
-              <h2 className="mt-1 text-2xl sm:text-3xl xl:text-4xl font-black tracking-tight text-[var(--text-primary)]">
+              <h2 className="mt-1 text-xl sm:text-2xl xl:text-3xl font-black tracking-tight text-[var(--text-primary)]">
                 Featured Posters &amp; Visuals
               </h2>
             </div>
@@ -168,39 +175,52 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {gallery.map((post) => (
               <article
                 key={post.id}
-                className="gaming-card group flex flex-col overflow-hidden"
+                className="gaming-card group flex flex-col justify-between overflow-hidden"
               >
                 {/* Clean image container without border highlights */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--surface-secondary)]">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--surface-secondary)]">
                   {post.cover_image ? (
                     <Image
                       src={post.cover_image}
                       alt={post.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[var(--text-muted)]">
-                      <Sparkles className="h-10 w-10 opacity-20" />
+                      <Sparkles className="h-8 w-8 opacity-20" />
                     </div>
                   )}
-                  <div className="absolute top-3 left-3 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] capitalize">
+                  <div className="absolute top-2.5 left-2.5 rounded-full glass px-2.5 py-0.5 text-[10px] font-bold text-[var(--text-secondary)] capitalize backdrop-blur-md">
                     {post.post_type}
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300 line-clamp-1">
+                <div className="p-4 sm:p-4.5 space-y-2">
+                  <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-1">
                     <Link href={`/posts/${post.slug}`}>
-                      <span className="absolute inset-0" />
                       {post.title}
                     </Link>
                   </h3>
+                  {post.excerpt && (
+                    <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
+                      {post.excerpt}
+                    </p>
+                  )}
+                  <div className="pt-2 border-t border-white/[0.04]">
+                    <Link
+                      href={`/posts/${post.slug}`}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] hover:text-white transition-colors"
+                    >
+                      <span>View Artwork</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
                 </div>
               </article>
             ))}
@@ -208,8 +228,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 5. Live Support CTA Banner (Fluid Full-Width) */}
-      <section className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pb-20">
+      {/* 5. Live Support CTA Banner (Fluid Full-Desktop Width) */}
+      <section className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 pb-20">
         <div className="relative rounded-3xl glass-elevated p-8 sm:p-14 overflow-hidden">
           <div className="relative z-10 max-w-2xl space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs font-semibold text-[var(--brand-primary)]">

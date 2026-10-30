@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -15,22 +15,31 @@ import {
 } from 'lucide-react';
 
 export function CinematicHeroContainer() {
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.defaultMuted = true;
+      video.muted = true;
+      video.play().catch(() => {
+        // Autoplay policy fallback
+      });
+    }
+  }, []);
 
   return (
     <section className="relative min-h-[640px] lg:min-h-[720px] xl:min-h-[780px] w-full flex items-center overflow-hidden border-b border-white/[0.06]">
       {/* 1. Looping Background Video (Audio Removed / Muted, Hardware Accelerated) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
-          onLoadedData={() => setVideoLoaded(true)}
-          className={`h-full w-full object-cover scale-[1.02] filter brightness-[0.75] contrast-[1.08] transition-opacity duration-1000 ${
-            videoLoaded ? 'opacity-40' : 'opacity-0'
-          }`}
+          className="h-full w-full object-cover scale-[1.02] filter brightness-[0.75] contrast-[1.08] opacity-40 transition-opacity duration-700"
         >
           <source src="/hero-bg.mp4" type="video/mp4" />
         </video>
@@ -48,7 +57,7 @@ export function CinematicHeroContainer() {
       </div>
 
       {/* 3. Hero Content Foreground Container */}
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 py-16 sm:px-8 lg:px-12 xl:px-16">
+      <div className="relative z-10 w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20 py-16 sm:py-20 lg:py-24">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Brand Copy & Actions */}
           <div className="lg:col-span-7 space-y-7 text-center lg:text-left">

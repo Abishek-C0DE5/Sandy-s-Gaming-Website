@@ -28,6 +28,28 @@ export async function createClient() {
 }
 
 /**
+ * Public, read-only Supabase client for ISR and statically cached pages.
+ * Does not read cookies, enabling edge CDN caching and ISR without forcing dynamic SSR.
+ */
+export function createPublicClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return [];
+      },
+      setAll() {},
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+}
+
+/**
  * Privileged Admin Supabase client (Server-side ONLY).
  * Uses SUPABASE_SERVICE_ROLE_KEY to bypass RLS for administrative operations.
  */

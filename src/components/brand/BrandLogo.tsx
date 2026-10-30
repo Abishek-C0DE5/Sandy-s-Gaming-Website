@@ -31,7 +31,7 @@ export function BrandLogo({
     <div className={`inline-flex items-center gap-2.5 select-none group ${className}`}>
       <div className="relative flex items-center justify-center shrink-0">
         <Image
-          src="/brand/sandys-gaming-logo.png"
+          src="/brand/sandys-gaming-logo.webp"
           alt="SANDY'S GAMING"
           width={config.width}
           height={config.height}

@@ -16,31 +16,26 @@ export function Skeleton({ className = '', ...props }: SkeletonProps) {
 
 export function FeedPostSkeleton() {
   return (
-    <div className="rounded-2xl glass-elevated overflow-hidden p-5 space-y-4">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-10 w-10 rounded-full shrink-0" />
-        <div className="space-y-1.5 flex-1">
-          <Skeleton className="h-3.5 w-36" />
-          <Skeleton className="h-2.5 w-20" />
+    <div className="rounded-2xl glass-elevated overflow-hidden flex flex-col justify-between">
+      {/* Top Media */}
+      <Skeleton className="aspect-[16/10] w-full rounded-none" />
+
+      {/* Body */}
+      <div className="p-4 sm:p-4.5 space-y-3">
+        <div className="space-y-1.5">
+          <Skeleton className="h-4 w-4/5 rounded" />
+          <Skeleton className="h-4 w-3/5 rounded" />
+          <Skeleton className="h-3 w-full rounded mt-2" />
         </div>
-        <Skeleton className="h-5 w-16 rounded-full" />
-      </div>
 
-      {/* Copy */}
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-5/6" />
-      </div>
-
-      {/* Media Image */}
-      <Skeleton className="aspect-[16/9] w-full rounded-xl" />
-
-      {/* Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
-        <Skeleton className="h-3 w-20" />
-        <Skeleton className="h-7 w-28 rounded-lg" />
+        {/* Footer */}
+        <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-5 w-5 rounded-full" />
+            <Skeleton className="h-3 w-16 rounded" />
+          </div>
+          <Skeleton className="h-3 w-12 rounded" />
+        </div>
       </div>
     </div>
   );

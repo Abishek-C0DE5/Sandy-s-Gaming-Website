@@ -1,19 +1,31 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
 import { connection } from 'next/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { BookOpen, Calendar, Clock, ArrowRight, ChevronLeft, ChevronRight, Search, Flame } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 export const metadata: Metadata = {
-  title: 'Blog & Esports News | Sandy\'s Gaming',
-  description: 'Explore competitive tournament breakdowns, patch meta analysis, and Sandy\'s Gaming community updates.',
+  title: 'Blog & Esports Meta Breakdown',
+  description:
+    'Explore in-depth esports tournament breakdowns, patch 9.0 meta analysis, competitive FPS guides, and Sandy\'s Gaming community updates.',
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'Blog & Esports Meta Breakdown | Sandy\'s Gaming',
+    description:
+      'Explore in-depth esports tournament breakdowns, patch 9.0 meta analysis, competitive FPS guides, and Sandy\'s Gaming community updates.',
+    type: 'website',
+  },
 };
 
 interface BlogPageProps {
   searchParams: Promise<{ page?: string; q?: string }>;
 }
+
+export const instant = false;
 
 export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   await connection();
@@ -23,14 +35,13 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   const from = (currentPage - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   let query = supabase
     .from('posts')
     .select('id, title, slug, excerpt, cover_image, published_at, post_type', { count: 'exact' })
     .eq('post_type', 'blog')
     .eq('status', 'published')
-    .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
     .range(from, to);
 
@@ -45,7 +56,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
   const blogList = posts || [];
 
   return (
-    <div className="w-full max-w-[1720px] mx-auto px-4 py-12 sm:px-8 lg:px-12 xl:px-16">
+    <div className="w-full max-w-[1920px] 2xl:max-w-none mx-auto px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b border-white/[0.06] pb-8 gap-6">
         <div>
@@ -53,10 +64,10 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
             <Flame className="h-4 w-4" />
             <span>Sandy&apos;s Editorial &amp; Esports Feed</span>
           </div>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--text-primary)] sm:text-4xl">
+          <h1 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[var(--text-primary)]">
             Latest Publications
           </h1>
-          <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
             In-depth guides on competitive gaming, esports rosters, and platform updates curated by Sandy&apos;s Gaming.
           </p>
         </div>
@@ -103,7 +114,7 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4.5 sm:gap-5 lg:gap-6">
             {blogList.map((post) => {
               const formattedDate = post.published_at
                 ? new Date(post.published_at).toLocaleDateString('en-US', {
@@ -116,59 +127,63 @@ export default async function BlogListingPage({ searchParams }: BlogPageProps) {
               return (
                 <article
                   key={post.id}
-                  className="gaming-card group flex flex-col justify-between overflow-hidden"
+                  className="rounded-2xl glass-elevated overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-white/[0.14] hover:shadow-xl hover:-translate-y-0.5 group"
                 >
-                  <div>
-                    {post.cover_image && (
-                      <div className="relative aspect-video w-full overflow-hidden bg-[var(--surface-secondary)]">
-                        <Image
-                          src={post.cover_image}
-                          alt={post.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                          unoptimized
-                        />
-                        <div className="absolute top-3 left-3 rounded-full glass px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)]">
-                          BLOG
-                        </div>
+                  <Link
+                    href={`/blog/${encodeURIComponent(post.slug)}`}
+                    className="block relative aspect-[16/10] w-full bg-[var(--surface-secondary)] overflow-hidden shrink-0"
+                  >
+                    {post.cover_image ? (
+                      <Image
+                        src={post.cover_image}
+                        alt={post.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--surface-secondary)] to-[var(--background)]">
+                        <BookOpen className="h-9 w-9 text-[var(--brand-primary)] opacity-30" />
                       </div>
                     )}
-                    <div className="p-6">
-                      <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] font-mono mb-3">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="h-3.5 w-3.5 text-[var(--brand-primary)]" />
-                          <time dateTime={post.published_at || ''}>{formattedDate}</time>
-                        </span>
-                        <span className="opacity-40">&bull;</span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5 text-[var(--text-muted)]" />
-                          <span>4 min read</span>
-                        </span>
+                    <div className="absolute top-2.5 left-2.5 rounded-full glass px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-md">
+                      Article
+                    </div>
+                    <div className="absolute top-2.5 right-2.5 rounded-full glass px-2 py-0.5 text-[10px] font-mono text-[var(--text-secondary)] backdrop-blur-md">
+                      {formattedDate}
+                    </div>
+                  </Link>
+
+                  <div className="p-4 sm:p-4.5 flex-1 flex flex-col justify-between space-y-3">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)] font-mono">
+                        <Clock className="h-3 w-3 text-[var(--brand-primary)]" />
+                        <span>4 min read</span>
                       </div>
 
-                      <h2 className="text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-300 line-clamp-2">
+                      <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors duration-200 line-clamp-2 leading-snug">
                         <Link href={`/blog/${encodeURIComponent(post.slug)}`}>
                           {post.title}
                         </Link>
                       </h2>
 
                       {post.excerpt && (
-                        <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)] line-clamp-3">
+                        <p className="text-xs leading-relaxed text-[var(--text-secondary)] line-clamp-2">
                           {post.excerpt}
                         </p>
                       )}
                     </div>
-                  </div>
 
-                  <div className="border-t border-white/[0.04] p-6 pt-3 pb-4">
-                    <Link
-                      href={`/blog/${encodeURIComponent(post.slug)}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-primary)] group/link"
-                    >
-                      <span>Read article</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/link:translate-x-1" />
-                    </Link>
+                    <div className="pt-2.5 border-t border-white/[0.04] flex items-center justify-between">
+                      <span className="text-[11px] text-[var(--text-muted)]">Sandy&apos;s Editorial</span>
+                      <Link
+                        href={`/blog/${encodeURIComponent(post.slug)}`}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-primary)] group-hover:text-white transition-colors"
+                      >
+                        <span>Read</span>
+                        <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+                      </Link>
+                    </div>
                   </div>
                 </article>
               );
